@@ -1,8 +1,5 @@
-//Computes the McCabe cyclomatic complexity of the whole program
-//@author Ca' Foscari - Software Security
-//@category Metrics
+package impl;
 
-import ghidra.app.script.GhidraScript;
 import ghidra.graph.GDirectedGraph;
 import ghidra.graph.GEdge;
 import ghidra.graph.GraphFactory;
@@ -10,14 +7,14 @@ import ghidra.program.model.block.*;
 import ghidra.program.model.listing.Program;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.ConsoleTaskMonitor;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class McCabe extends GhidraScript {
 
-    private int countConnectedComponents(GDirectedGraph<String, GEdge<String>> graph) {
+public class McCabe {
+
+    private static int countConnectedComponents(GDirectedGraph<String, GEdge<String>> graph) {
         int count = 0;
         Set<String> visited = new HashSet<String>();
         Set<String> todo = new HashSet<>();
@@ -52,7 +49,7 @@ public class McCabe extends GhidraScript {
         return count;
     }
 
-    private int computeMcCabe(Program program) throws CancelledException {
+    public static int computeMcCabe(Program program) throws CancelledException {
 
         ConsoleTaskMonitor ctm = new ConsoleTaskMonitor();
         BasicBlockModel bbm = new BasicBlockModel(program);
@@ -100,17 +97,8 @@ public class McCabe extends GhidraScript {
         int nComponents = countConnectedComponents(graph);
 
         int result = nEdges - nVertices + 2 * nComponents;
-        printf("Complexity[%s]: %d - %d + 2 * %d = %d\n", program.getName(), nEdges, nVertices, nComponents, result);
+        // printf("Complexity[%s]: %d - %d + 2 * %d = %d\n", program.getName(), nEdges, nVertices, nComponents, result);
         return result;
     }
 
-    @Override
-    protected void run() throws Exception {
-        if (currentProgram == null) {
-            printerr("no current program");
-            return;
-        }
-        int complexity = computeMcCabe(currentProgram);
-        println("Complexity: " + complexity);
-    }
 }

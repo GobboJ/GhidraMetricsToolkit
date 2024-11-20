@@ -1,25 +1,22 @@
-//Computes the Halstead metrics of a function and the entire program
-//@author Ca' Foscari - Software Security
-//@category Metrics
+package impl;
 
-import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class Halstead extends GhidraScript {
 
-    private Result countProgram(Program program) {
+public class Halstead {
+
+    public static Result halsteadByProgram(Program program) {
         FunctionIterator functions = program.getFunctionManager().getFunctions(true);
         Result res = new Result(0, 0, 0, 0);
         for (Function f : functions) {
-            res.add(countOps(f));
+            res.add(halsteadByFunction(f));
         }
         return res;
     }
 
-    private Result countOps(Function function) {
+    public static Result halsteadByFunction(Function function) {
 
         ArrayList<String> operands = new ArrayList<>();
         ArrayList<String> operators = new ArrayList<>();
@@ -43,25 +40,7 @@ public class Halstead extends GhidraScript {
         return new Result(new HashSet<>(operators).size(), new HashSet<>(operands).size(), operators.size(), operands.size());
     }
 
-    @Override
-    protected void run() throws Exception {
-        if (currentProgram == null) {
-            printerr("no current program");
-            return;
-        }
-
-
-        Function currentFunction = currentProgram.getFunctionManager().getFunctionAt(currentAddress);
-        if (currentFunction != null) {
-            println("Halstead metrics for function: " + currentFunction.getName());
-            print(countOps(currentFunction).toString());
-        }
-
-        println("Halstead metric for whole program");
-        print(countProgram(currentProgram).toString());
-    }
-
-    private static class Result {
+    public static class Result {
         int n_1;
         int n_2;
         int N_1;
@@ -103,4 +82,5 @@ public class Halstead extends GhidraScript {
                     """, programVocab, programLength, estimatedLength, volume, difficulty, effort, timeToProgram, deliveredBugs);
         }
     }
+
 }
