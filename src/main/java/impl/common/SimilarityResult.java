@@ -47,6 +47,14 @@ public class SimilarityResult {
         return matches.stream().mapToDouble(m -> m.similarity).sum() / matches.size();
     }
 
+    public List<Object[]> getMatches() {
+        List<Object[]> s = new ArrayList<>();
+        for (Match m : matches) {
+            s.add(new Object[] {m.similarity, m.f1.getName(), m.f2.getName()});
+        }
+        return s;
+    }
+
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
