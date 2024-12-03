@@ -40,7 +40,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         tabbedPane.addTab("LCS", lcsTable.getPanel());
 
         try {
-            SimilarityResultTable ncdTable = new SimilarityResultTable(plugin, new Ncd(false));
+            SimilarityResultTable ncdTable = new SimilarityResultTable(plugin, new Ncd());
             tabbedPane.addTab("NCD", ncdTable.getPanel());
         } catch (OSFileNotFoundException e) {
             throw new RuntimeException(e);

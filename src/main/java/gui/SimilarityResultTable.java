@@ -9,9 +9,11 @@ import metrics.GhidraMetricsPlugin;
 import utils.ProjectUtils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,15 +33,34 @@ public class SimilarityResultTable {
             }
         };
 
-        JTable table = new JTable(tableModel) {
+        JTable table = new JTable(tableModel);
+
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
+
+        DefaultTableCellRenderer doubleRenderer = new DefaultTableCellRenderer() {
+            private final DecimalFormat formatter = new DecimalFormat("0.00");
+
             @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-                if (!isRowSelected(row))
-                    c.setBackground(row % 2 == 0 ? getBackground() : Color.LIGHT_GRAY);
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (value instanceof Double) {
+                    double doubleValue = (Double) value;
+
+                    int red = (int) ((1.0 - doubleValue) * 255);
+                    int green = (int) (doubleValue * 255);
+                    int blue = 100;
+                    red = (red + 255) / 2;
+                    green = (green + 255) / 2;
+
+                    c.setBackground(new Color(red, green, blue));
+                    c.setForeground(Color.BLACK);
+                }
+                setText(value instanceof Double ? formatter.format(value) : value.toString());
                 return c;
             }
         };
+        table.getColumnModel().getColumn(0).setCellRenderer(doubleRenderer);
 
         JScrollPane scrollPane = new JScrollPane(table);
 
