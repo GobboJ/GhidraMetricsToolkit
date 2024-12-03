@@ -18,7 +18,8 @@ public class OpcodeFrequencyScript extends GhidraScript {
         }
 
         Program p2 = askProgram("Pick second program");
-        SimilarityResult r = OpcodeFrequency.opcode_frequency(currentProgram, p2);
+        OpcodeFrequency metric = new OpcodeFrequency();
+        SimilarityResult r = metric.computeSimilarity(currentProgram, p2);
         println(String.format("OpFreq[%s, %s] Overall similarity = %.2f", currentProgram.getName(), p2.getName(), r.overallSimilarity()));
         r.sortBySimilarity();
         print(r.toString());

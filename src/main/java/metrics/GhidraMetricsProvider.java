@@ -3,9 +3,13 @@ package metrics;
 import docking.ActionContext;
 import docking.action.DockingAction;
 import docking.action.ToolBarData;
+import ghidra.framework.OSFileNotFoundException;
 import ghidra.framework.plugintool.ComponentProviderAdapter;
 import ghidra.util.Msg;
 import gui.SimilarityResultTable;
+import impl.Lcs;
+import impl.Ncd;
+import impl.OpcodeFrequency;
 import resources.Icons;
 
 import javax.swing.*;
@@ -13,10 +17,9 @@ import java.awt.*;
 
 public class GhidraMetricsProvider extends ComponentProviderAdapter {
 
-    private GhidraMetricsPlugin plugin;
+    private final GhidraMetricsPlugin plugin;
     private JPanel panel;
     private DockingAction action;
-    private SimilarityResultTable lcsTable;
 
     public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
         super(ghidraMetricsPlugin.getTool(), pluginName, pluginName);
@@ -32,10 +35,19 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         tabbedPane.addTab("Entropy", new JPanel());
         tabbedPane.addTab("Halstead", new JPanel());
         tabbedPane.addTab("McCabe", new JPanel());
-        lcsTable = new SimilarityResultTable(plugin);
+
+        SimilarityResultTable lcsTable = new SimilarityResultTable(plugin, new Lcs());
         tabbedPane.addTab("LCS", lcsTable.getPanel());
-        tabbedPane.addTab("NCD", new JPanel());
-        tabbedPane.addTab("Opcode Freq", new JPanel());
+
+        try {
+            SimilarityResultTable ncdTable = new SimilarityResultTable(plugin, new Ncd(false));
+            tabbedPane.addTab("NCD", ncdTable.getPanel());
+        } catch (OSFileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        
+        SimilarityResultTable opcodeFreqTable = new SimilarityResultTable(plugin, new OpcodeFrequency());
+        tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
 
         panel.add(tabbedPane);
         setVisible(true);

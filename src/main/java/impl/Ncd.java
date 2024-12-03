@@ -1,21 +1,31 @@
 package impl;
 
+import ghidra.framework.Application;
+import ghidra.framework.OSFileNotFoundException;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryAccessException;
+import impl.common.SimilarityInterface;
 import impl.common.SimilarityResult;
 import impl.utils.LrzipWrapper;
 import java.io.File;
 
 
-public class Ncd {
+public class Ncd implements SimilarityInterface {
 
-    public static double ncdSimilarity(File f1, File f2) throws Exception {
+    private final String lrzipPath;
 
-        long size1 = LrzipWrapper.measure(f1);
-        long size2 = LrzipWrapper.measure(f2);
-        long sizeConcat = LrzipWrapper.measure(f1, f2);
+    public Ncd() throws OSFileNotFoundException {
+        lrzipPath = Application.getOSFile("GhidraMetrics", "lrzip").getPath();
+    }
+
+    public double ncdSimilarity(File f1, File f2) throws Exception {
+
+        LrzipWrapper lrzipWrapper = new LrzipWrapper(lrzipPath);
+        long size1 = lrzipWrapper.measure(f1);
+        long size2 = lrzipWrapper.measure(f2);
+        long sizeConcat = lrzipWrapper.measure(f1, f2);
 
         return 1 - (double) (sizeConcat - Math.min(size1, size2)) / Math.max(size1, size2);
     }
@@ -31,7 +41,8 @@ public class Ncd {
         return functionBytes;
     }
 
-    public static SimilarityResult ncdFunctionSimilarity(Program p1, Program p2) throws Exception {
+    @Override
+    public SimilarityResult computeSimilarity(Program p1, Program p2) throws Exception {
         SimilarityResult matches = new SimilarityResult(p1, p2);
         for (Function f_1 : p1.getFunctionManager().getFunctions(true)) {
             if (f_1.isExternal() || f_1.isThunk())
@@ -44,9 +55,10 @@ public class Ncd {
                     continue;
                 byte[] f2Bytes = getFunctionBytes(f_2);
 
-                long size1 = LrzipWrapper.measure(f1Bytes);
-                long size2 = LrzipWrapper.measure(f2Bytes);
-                long sizeConcat = LrzipWrapper.measure(f1Bytes, f2Bytes);
+                LrzipWrapper lrzipWrapper = new LrzipWrapper(lrzipPath);
+                long size1 = lrzipWrapper.measure(f1Bytes);
+                long size2 = lrzipWrapper.measure(f2Bytes);
+                long sizeConcat = lrzipWrapper.measure(f1Bytes, f2Bytes);
 
                 double sim = 1 - (double) (sizeConcat - Math.min(size1, size2)) / Math.max(size1, size2);
 

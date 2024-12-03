@@ -2,7 +2,8 @@ package gui;
 
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
-import impl.Lcs;
+import ghidra.util.Msg;
+import impl.common.SimilarityInterface;
 import impl.common.SimilarityResult;
 import metrics.GhidraMetricsPlugin;
 import utils.ProjectUtils;
@@ -16,9 +17,11 @@ import java.util.List;
 
 public class SimilarityResultTable {
 
-    private JPanel panel;
+    private final JPanel panel;
 
-    public SimilarityResultTable(GhidraMetricsPlugin plugin) {
+    public SimilarityResultTable(GhidraMetricsPlugin plugin, SimilarityInterface metric) {
+
+        panel = new JPanel(new BorderLayout());
 
         String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
@@ -28,7 +31,7 @@ public class SimilarityResultTable {
             }
         };
 
-        JTable table = new JTable(tableModel){
+        JTable table = new JTable(tableModel) {
             @Override
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
@@ -53,17 +56,21 @@ public class SimilarityResultTable {
         jComboBox.setSelectedIndex(-1);
         jComboBox.setVisible(true);
         jComboBox.addActionListener(e -> {
-            DomainFile choice = (DomainFile) jComboBox.getSelectedItem();
-            Program p = ProjectUtils.getProgramFromDomainFile(choice);
-            SimilarityResult result = Lcs.lcs_similarity(plugin.getCurrentProgram(), p);
-            result.sortBySimilarity();
-            populateTable(result);
+            try {
+                DomainFile choice = (DomainFile) jComboBox.getSelectedItem();
+                Program p = ProjectUtils.getProgramFromDomainFile(choice);
+                SimilarityResult result = metric.computeSimilarity(plugin.getCurrentProgram(), p);
+                result.sortBySimilarity();
+                populateTable(result);
+            } catch (Exception ex) {
+                Msg.showError(getClass(), panel, "Metric computation failed!", ex.getMessage());
+                jComboBox.setSelectedIndex(-1);
+            }
         });
 
         topPanel.add(new JLabel("Compare to: "));
         topPanel.add(jComboBox);
 
-        panel = new JPanel(new BorderLayout());
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 

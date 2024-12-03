@@ -4,12 +4,13 @@ import generic.algorithms.ReducingListBasedLcs;
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
+import impl.common.SimilarityInterface;
 import impl.common.SimilarityResult;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Lcs {
+public class Lcs implements SimilarityInterface {
 
     private static List<String> get_opcode_listing(Function function) {
         List<String> listing = new ArrayList<>();
@@ -19,7 +20,8 @@ public class Lcs {
         return listing;
     }
 
-    public static SimilarityResult lcs_similarity(Program p1, Program p2) {
+    @Override
+    public SimilarityResult computeSimilarity(Program p1, Program p2) {
 
         SimilarityResult matches = new SimilarityResult(p1, p2);
 

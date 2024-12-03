@@ -3,6 +3,7 @@ package impl;
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
+import impl.common.SimilarityInterface;
 import impl.common.SimilarityResult;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class OpcodeFrequency {
+public class OpcodeFrequency implements SimilarityInterface {
 
     private static Map<String, Double> get_histogram(Function function) {
         Map<String, Double> histogram = new HashMap<>();
@@ -38,8 +39,8 @@ public class OpcodeFrequency {
         return distance;
     }
 
-
-    public static SimilarityResult opcode_frequency(Program p1, Program p2) {
+    @Override
+    public SimilarityResult computeSimilarity(Program p1, Program p2) {
 
         SimilarityResult result = new SimilarityResult(p1, p2);
         for (Function f_1 : p1.getFunctionManager().getFunctions(true)) {

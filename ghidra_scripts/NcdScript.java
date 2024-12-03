@@ -24,11 +24,11 @@ public class NcdScript extends GhidraScript {
             File p2File = promptFileChooser(p2);
 
             if (programFile.exists() && p2File.exists()) {
-                double res = Ncd.ncdSimilarity(programFile, p2File);
-                Ncd.ncdFunctionSimilarity(currentProgram, p2);
+                Ncd metric = new Ncd();
+                double res = metric.ncdSimilarity(programFile, p2File);
                 println(String.format("NCD[%s, %s] Similarity: %f", currentProgram.getName(), p2.getName(), res));
 
-                SimilarityResult fRes = Ncd.ncdFunctionSimilarity(currentProgram, p2);
+                SimilarityResult fRes = metric.computeSimilarity(currentProgram, p2);
                 fRes.sortBySimilarity();
                 print(fRes.toString());
             }
