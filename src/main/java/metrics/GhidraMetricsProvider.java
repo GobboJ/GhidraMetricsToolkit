@@ -1,16 +1,13 @@
 package metrics;
 
-import docking.ActionContext;
 import docking.action.DockingAction;
-import docking.action.ToolBarData;
 import ghidra.framework.OSFileNotFoundException;
 import ghidra.framework.plugintool.ComponentProviderAdapter;
-import ghidra.util.Msg;
+import gui.HalsteadGui;
 import gui.SimilarityResultTable;
 import impl.Lcs;
 import impl.Ncd;
 import impl.OpcodeFrequency;
-import resources.Icons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,11 +18,15 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private JPanel panel;
     private DockingAction action;
 
+    private HalsteadGui halsteadGui;
+    private SimilarityResultTable lcsTable;
+    private SimilarityResultTable ncdTable;
+    private SimilarityResultTable opcodeFreqTable;
+
     public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
         super(ghidraMetricsPlugin.getTool(), pluginName, pluginName);
         this.plugin = ghidraMetricsPlugin;
         buildPanel();
-        createActions();
     }
 
     // Customize GUI
@@ -33,39 +34,39 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         panel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Entropy", new JPanel());
-        tabbedPane.addTab("Halstead", new JPanel());
+
+        halsteadGui = new HalsteadGui(plugin);
+        tabbedPane.addTab("Halstead", halsteadGui.getPanel());
+
         tabbedPane.addTab("McCabe", new JPanel());
 
-        SimilarityResultTable lcsTable = new SimilarityResultTable(plugin, new Lcs());
+        lcsTable = new SimilarityResultTable(plugin, new Lcs());
         tabbedPane.addTab("LCS", lcsTable.getPanel());
 
         try {
-            SimilarityResultTable ncdTable = new SimilarityResultTable(plugin, new Ncd());
+            ncdTable = new SimilarityResultTable(plugin, new Ncd());
             tabbedPane.addTab("NCD", ncdTable.getPanel());
         } catch (OSFileNotFoundException e) {
+            // TODO Handle more gracefully
             throw new RuntimeException(e);
         }
-        
-        SimilarityResultTable opcodeFreqTable = new SimilarityResultTable(plugin, new OpcodeFrequency());
+
+        opcodeFreqTable = new SimilarityResultTable(plugin, new OpcodeFrequency());
         tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
 
         panel.add(tabbedPane);
         setVisible(true);
     }
 
-    // TODO: Customize actions
-    private void createActions() {
-        action = new DockingAction("My Action", getName()) {
-            @Override
-            public void actionPerformed(ActionContext context) {
+    public void handleProgramActivated() {
+        halsteadGui.populateProgramTable();
+        lcsTable.resetTable();
+        ncdTable.resetTable();
+        opcodeFreqTable.resetTable();
+    }
 
-                Msg.showInfo(getClass(), panel, "Custom Action", "Hello!");
-            }
-        };
-        action.setToolBarData(new ToolBarData(Icons.REFRESH_ICON, null));
-        action.setEnabled(true);
-        action.markHelpUnnecessary();
-        dockingTool.addLocalAction(this, action);
+    public void handleLocationChanged() {
+        halsteadGui.populateFunctionTable();
     }
 
     @Override

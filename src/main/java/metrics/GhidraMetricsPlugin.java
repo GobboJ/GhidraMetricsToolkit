@@ -5,7 +5,8 @@ import ghidra.app.plugin.ProgramPlugin;
 import ghidra.framework.plugintool.PluginInfo;
 import ghidra.framework.plugintool.PluginTool;
 import ghidra.framework.plugintool.util.PluginStatus;
-
+import ghidra.program.model.listing.Program;
+import ghidra.program.util.ProgramLocation;
 
 //@formatter:off
 @PluginInfo(
@@ -27,4 +28,15 @@ public class GhidraMetricsPlugin extends ProgramPlugin {
         provider = new GhidraMetricsProvider(this, pluginName);
     }
 
+    @Override
+    protected void programActivated(Program program) {
+        provider.handleProgramActivated();
+        super.programActivated(program);
+    }
+
+    @Override
+    protected void locationChanged(ProgramLocation loc) {
+        provider.handleLocationChanged();
+        super.locationChanged(loc);
+    }
 }

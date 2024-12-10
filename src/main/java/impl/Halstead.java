@@ -3,6 +3,7 @@ package impl;
 import ghidra.program.model.listing.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 
 public class Halstead {
@@ -60,7 +61,8 @@ public class Halstead {
             this.N_2 += res.N_2;
         }
 
-        public String toString() {
+        public List<Object[]> compute() {
+            ArrayList<Object[]> s = new ArrayList<>();
             int programLength = N_1 + N_2;
             int programVocab = n_1 + n_2;
             double estimatedLength = n_1 * Math.log(n_1) + n_2 * Math.log(n_2);
@@ -70,6 +72,21 @@ public class Halstead {
             double timeToProgram = effort / 18;
             double deliveredBugs = volume / 3000;
 
+            s.add(new Object[]{"Program Vocabulary (n)", programVocab});
+            s.add(new Object[]{"Program Length (N)", programLength});
+            s.add(new Object[]{"Estimated Length (~N)", estimatedLength});
+            s.add(new Object[]{"Volume (V)", volume});
+            s.add(new Object[]{"Difficulty (D)", difficulty});
+            s.add(new Object[]{"Effort (E)", effort});
+            s.add(new Object[]{"Time to Program (T)", timeToProgram});
+            s.add(new Object[]{"Delivered Bugs (B)", deliveredBugs});
+
+            return s;
+        }
+
+        public String toString() {
+
+            List<Object[]> res = compute();
             return String.format("""
                         Program Vocabulary (n): %15d
                             Program Length (N): %15d
@@ -79,7 +96,7 @@ public class Halstead {
                                     Effort (E): %15.2f
                            Time to Program (T): %15.2f seconds
                             Delivered Bugs (B): %15.2f
-                    """, programVocab, programLength, estimatedLength, volume, difficulty, effort, timeToProgram, deliveredBugs);
+                    """, res.get(0)[1], res.get(1)[1], res.get(2)[1], res.get(3)[1], res.get(4)[1], res.get(5)[1], res.get(6)[1], res.get(7)[1]);
         }
     }
 

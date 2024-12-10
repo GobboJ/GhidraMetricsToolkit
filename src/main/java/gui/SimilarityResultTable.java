@@ -19,13 +19,15 @@ import java.util.List;
 
 public class SimilarityResultTable {
 
+    private static final String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
+
     private final JPanel panel;
+    private final JComboBox<DomainFile> programChooser;
 
     public SimilarityResultTable(GhidraMetricsPlugin plugin, SimilarityInterface metric) {
 
         panel = new JPanel(new BorderLayout());
 
-        String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -35,8 +37,7 @@ public class SimilarityResultTable {
 
         JTable table = new JTable(tableModel);
 
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
-        table.setRowSorter(sorter);
+        table.setRowSorter(new TableRowSorter<>(tableModel));
 
         DefaultTableCellRenderer doubleRenderer = new DefaultTableCellRenderer() {
             private final DecimalFormat formatter = new DecimalFormat("0.00");
@@ -70,27 +71,30 @@ public class SimilarityResultTable {
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JComboBox<DomainFile> jComboBox = new JComboBox<>();
-        for (DomainFile f : programFiles) {
-            jComboBox.addItem(f);
+
+        programChooser = new JComboBox<>();
+        for (DomainFile program : programFiles) {
+            programChooser.addItem(program);
         }
-        jComboBox.setSelectedIndex(-1);
-        jComboBox.setVisible(true);
-        jComboBox.addActionListener(e -> {
+        programChooser.setSelectedIndex(-1);
+        programChooser.setVisible(true);
+        programChooser.addActionListener(e -> {
             try {
-                DomainFile choice = (DomainFile) jComboBox.getSelectedItem();
-                Program p = ProjectUtils.getProgramFromDomainFile(choice);
-                SimilarityResult result = metric.computeSimilarity(plugin.getCurrentProgram(), p);
-                result.sortBySimilarity();
-                populateTable(result);
+                DomainFile choice = (DomainFile) programChooser.getSelectedItem();
+                if (choice != null) {
+                    Program program = ProjectUtils.getProgramFromDomainFile(choice);
+                    SimilarityResult result = metric.computeSimilarity(plugin.getCurrentProgram(), program);
+                    result.sortBySimilarity();
+                    populateTable(result);
+                }
             } catch (Exception ex) {
                 Msg.showError(getClass(), panel, "Metric computation failed!", ex.getMessage());
-                jComboBox.setSelectedIndex(-1);
+                programChooser.setSelectedIndex(-1);
             }
         });
 
         topPanel.add(new JLabel("Compare to: "));
-        topPanel.add(jComboBox);
+        topPanel.add(programChooser);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -102,9 +106,17 @@ public class SimilarityResultTable {
         DefaultTableModel tableModel = (DefaultTableModel) panel.getClientProperty("tableModel");
         if (tableModel != null) {
             tableModel.setRowCount(0);
-            for (Object[] l : result.getMatches()) {
-                tableModel.addRow(l);
+            for (Object[] row : result.getMatches()) {
+                tableModel.addRow(row);
             }
+        }
+    }
+
+    public void resetTable() {
+        DefaultTableModel tableModel = (DefaultTableModel) panel.getClientProperty("tableModel");
+        if (tableModel != null) {
+            tableModel.setRowCount(0);
+            programChooser.setSelectedIndex(-1);
         }
     }
 
