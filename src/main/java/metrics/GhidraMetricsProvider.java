@@ -1,8 +1,8 @@
 package metrics;
 
-import docking.action.DockingAction;
 import ghidra.framework.OSFileNotFoundException;
 import ghidra.framework.plugintool.ComponentProviderAdapter;
+import gui.EntropyGui;
 import gui.HalsteadGui;
 import gui.SimilarityResultTable;
 import impl.Lcs;
@@ -16,8 +16,8 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
 
     private final GhidraMetricsPlugin plugin;
     private JPanel panel;
-    private DockingAction action;
 
+    private EntropyGui entropyGui;
     private HalsteadGui halsteadGui;
     private SimilarityResultTable lcsTable;
     private SimilarityResultTable ncdTable;
@@ -33,7 +33,9 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private void buildPanel() {
         panel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Entropy", new JPanel());
+
+        entropyGui = new EntropyGui(plugin);
+        tabbedPane.addTab("Entropy", entropyGui.getPanel());
 
         halsteadGui = new HalsteadGui(plugin);
         tabbedPane.addTab("Halstead", halsteadGui.getPanel());
@@ -63,6 +65,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         lcsTable.resetTable();
         ncdTable.resetTable();
         opcodeFreqTable.resetTable();
+        entropyGui.resetTable();
     }
 
     public void handleLocationChanged() {

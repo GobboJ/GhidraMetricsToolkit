@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class Entropy {
 
-    public static ArrayList<Pair<String, Double>> entropyBySection(Program program) {
+    public static ArrayList<Pair<String, Double>> entropyBySection(Program program, int base) {
 
         ArrayList<Pair<String, Double>> entropyList = new ArrayList<>();
         Memory m = program.getMemory();
@@ -23,7 +23,7 @@ public class Entropy {
 
             try {
                 byte[] data = b.getData().readAllBytes();
-                double res = computeEntropy(data, 2);
+                double res = computeEntropy(data, base);
                 entropyList.add(new Pair<>(b.getName(), res));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -32,9 +32,17 @@ public class Entropy {
         return entropyList;
     }
 
-    public static double binaryEntropy(File file) throws IOException {
+    public static ArrayList<Pair<String, Double>> entropyBySection(Program program) {
+        return entropyBySection(program, 2);
+    }
+
+    public static double binaryEntropy(File file, int base) throws IOException {
         byte[] content = Files.readAllBytes(file.toPath());
-        return computeEntropy(content, 2);
+        return computeEntropy(content, base);
+    }
+
+    public static double binaryEntropy(File file) throws IOException {
+        return binaryEntropy(file, 2);
     }
 
     private static double computeEntropy(byte[] data, float base) throws IOException {
