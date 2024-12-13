@@ -4,6 +4,7 @@ import ghidra.framework.OSFileNotFoundException;
 import ghidra.framework.plugintool.ComponentProviderAdapter;
 import gui.EntropyGui;
 import gui.HalsteadGui;
+import gui.McCabeGui;
 import gui.SimilarityResultTable;
 import impl.Lcs;
 import impl.Ncd;
@@ -19,6 +20,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
 
     private EntropyGui entropyGui;
     private HalsteadGui halsteadGui;
+    private McCabeGui mcCabeGui;
     private SimilarityResultTable lcsTable;
     private SimilarityResultTable ncdTable;
     private SimilarityResultTable opcodeFreqTable;
@@ -40,7 +42,8 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         halsteadGui = new HalsteadGui(plugin);
         tabbedPane.addTab("Halstead", halsteadGui.getPanel());
 
-        tabbedPane.addTab("McCabe", new JPanel());
+        mcCabeGui = new McCabeGui(plugin);
+        tabbedPane.addTab("McCabe", mcCabeGui.getPanel());
 
         lcsTable = new SimilarityResultTable(plugin, new Lcs());
         tabbedPane.addTab("LCS", lcsTable.getPanel());
@@ -66,6 +69,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         ncdTable.resetTable();
         opcodeFreqTable.resetTable();
         entropyGui.resetTable();
+        mcCabeGui.resetTable();
     }
 
     public void handleLocationChanged() {

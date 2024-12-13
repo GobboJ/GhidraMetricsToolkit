@@ -1,12 +1,18 @@
 package impl;
 
+import generic.stl.Pair;
 import ghidra.graph.GDirectedGraph;
 import ghidra.graph.GEdge;
 import ghidra.graph.GraphFactory;
 import ghidra.program.model.block.*;
+import ghidra.program.model.listing.Function;
+import ghidra.program.model.listing.FunctionIterator;
 import ghidra.program.model.listing.Program;
+import ghidra.program.util.CyclomaticComplexity;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.ConsoleTaskMonitor;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,7 +22,7 @@ public class McCabe {
 
     private static int countConnectedComponents(GDirectedGraph<String, GEdge<String>> graph) {
         int count = 0;
-        Set<String> visited = new HashSet<String>();
+        Set<String> visited = new HashSet<>();
         Set<String> todo = new HashSet<>();
 
         for (String s : graph.getVertices()) {
@@ -99,6 +105,19 @@ public class McCabe {
         int result = nEdges - nVertices + 2 * nComponents;
         // printf("Complexity[%s]: %d - %d + 2 * %d = %d\n", program.getName(), nEdges, nVertices, nComponents, result);
         return result;
+    }
+
+    public static ArrayList<Pair<String, Integer>> computeFunctions(Program program) throws CancelledException {
+
+        ArrayList<Pair<String, Integer>> results = new ArrayList<>();
+        CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
+        FunctionIterator functions = program.getFunctionManager().getFunctions(true);
+        for (Function f : functions) {
+            if (f.isThunk() || f.isExternal())
+                continue;
+            results.add(new Pair<>(f.getName(), cyclomaticComplexity.calculateCyclomaticComplexity(f, new ConsoleTaskMonitor())));
+        }
+        return results;
     }
 
 }
