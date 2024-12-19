@@ -27,7 +27,8 @@ public class Ncd implements SimilarityInterface {
         long size2 = lrzipWrapper.measure(f2);
         long sizeConcat = lrzipWrapper.measure(f1, f2);
 
-        return 1 - (double) (sizeConcat - Math.min(size1, size2)) / Math.max(size1, size2);
+        double value = 1 - (double) (sizeConcat - Math.min(size1, size2)) / Math.max(size1, size2);
+        return Math.clamp(value, 0, 1);
     }
 
     private static byte[] getFunctionBytes(Function function) {

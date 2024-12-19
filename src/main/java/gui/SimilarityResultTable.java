@@ -66,7 +66,7 @@ public class SimilarityResultTable {
         JScrollPane scrollPane = new JScrollPane(table);
 
         List<DomainFile> programFiles = new ArrayList<>();
-        ProjectUtils.findProgramsRecursively(plugin.getTool().getProject().getProjectData().getRootFolder(), programFiles);
+        ProjectUtils.getProgramList(plugin.getTool().getProject().getProjectData().getRootFolder(), programFiles);
 
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

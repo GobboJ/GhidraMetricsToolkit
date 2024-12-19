@@ -13,29 +13,23 @@ import java.util.List;
 
 public class ProjectUtils {
 
-    public static void findProgramsRecursively(DomainFolder folder, List<DomainFile> programFiles) {
-        // Add programs in this folder
+    public static void getProgramList(DomainFolder folder, List<DomainFile> programFiles) {
         for (DomainFile file : folder.getFiles()) {
             if (Program.class.isAssignableFrom(file.getDomainObjectClass())) {
                 programFiles.add(file);
             }
         }
-
-        // Recurse into subfolders
         for (DomainFolder subFolder : folder.getFolders()) {
-            findProgramsRecursively(subFolder, programFiles);
+            getProgramList(subFolder, programFiles);
         }
     }
 
     public static Program getProgramFromDomainFile(DomainFile domainFile) {
 
         Program program = null;
-        int openMode = DomainFile.DEFAULT_VERSION;
-        TaskMonitor monitor = TaskMonitor.DUMMY;
 
         try {
-            // Open the domain file as a Program
-            DomainObject domainObject = domainFile.getDomainObject(openMode, false, false, monitor);
+            DomainObject domainObject = domainFile.getDomainObject(DomainFile.DEFAULT_VERSION, false, false, TaskMonitor.DUMMY);
             if (domainObject instanceof Program) {
                 program = (Program) domainObject;
             }

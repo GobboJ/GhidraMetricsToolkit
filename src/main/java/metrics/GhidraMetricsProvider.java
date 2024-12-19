@@ -2,10 +2,7 @@ package metrics;
 
 import ghidra.framework.OSFileNotFoundException;
 import ghidra.framework.plugintool.ComponentProviderAdapter;
-import gui.EntropyGui;
-import gui.HalsteadGui;
-import gui.McCabeGui;
-import gui.SimilarityResultTable;
+import gui.*;
 import impl.Lcs;
 import impl.Ncd;
 import impl.OpcodeFrequency;
@@ -24,6 +21,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private SimilarityResultTable lcsTable;
     private SimilarityResultTable ncdTable;
     private SimilarityResultTable opcodeFreqTable;
+    private RopSimilarityGui ropSimilarityGui;
 
     public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
         super(ghidraMetricsPlugin.getTool(), pluginName, pluginName);
@@ -59,6 +57,9 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         opcodeFreqTable = new SimilarityResultTable(plugin, new OpcodeFrequency());
         tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
 
+        ropSimilarityGui = new RopSimilarityGui(plugin);
+        tabbedPane.addTab("ROP", ropSimilarityGui.getPanel());
+
         panel.add(tabbedPane);
         setVisible(true);
     }
@@ -70,6 +71,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         opcodeFreqTable.resetTable();
         entropyGui.resetTable();
         mcCabeGui.resetTable();
+        ropSimilarityGui.resetGui();
     }
 
     public void handleLocationChanged() {
