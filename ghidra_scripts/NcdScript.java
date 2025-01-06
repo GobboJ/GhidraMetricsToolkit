@@ -4,10 +4,10 @@
 
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
-import ghidra.util.exception.CancelledException;
 import java.io.*;
 import impl.Ncd;
 import impl.common.SimilarityResult;
+import utils.ProjectUtils;
 
 
 public class NcdScript extends GhidraScript {
@@ -17,35 +17,43 @@ public class NcdScript extends GhidraScript {
 
         String os = System.getProperty("os.name").toLowerCase();
 
-        if (os.contains("linux")) {
-
-            File programFile = promptFileChooser(currentProgram);
-            Program p2 = askProgram("Pick second program");
-            File p2File = promptFileChooser(p2);
-
-            if (programFile.exists() && p2File.exists()) {
-                Ncd metric = new Ncd();
-                double res = metric.ncdSimilarity(programFile, p2File);
-                println(String.format("NCD[%s, %s] Similarity: %f", currentProgram.getName(), p2.getName(), res));
-
-                SimilarityResult fRes = metric.computeSimilarity(currentProgram, p2);
-                fRes.sortBySimilarity();
-                print(fRes.toString());
-            }
+        if (!os.contains("linux")) {
+            println("NCD is only available on linux");
+            return;
         }
-    }
 
-    private File promptFileChooser(Program program) throws CancelledException {
-        File f = new File(program.getExecutablePath());
-        if (!f.exists()) {
-            if (!isRunningHeadless()) {
-                println("Couldn't find the program file, please choose one:");
-                f = askFile("Select program file", "Select File");
-            } else {
-                printerr("Couldn't find the program file, aborting...");
+        Program p2;
+        if (isRunningHeadless()) {
+            String[] args = getScriptArgs();
+            if (args.length != 1) {
+                printerr("One parameter expected");
+                return;
             }
+            String programName = args[0];
+            p2 = ProjectUtils.getProgramByName(state.getProject(), programName);
+        } else {
+            p2 = askProgram("Pick second program");
         }
-        return f;
+
+        if (p2 == null) {
+            printerr("second program not found");
+            return;
+        }
+
+        File programFile = ProjectUtils.exportProgram(currentProgram);
+        File p2File = ProjectUtils.exportProgram(p2);
+        if (programFile.exists() && p2File.exists()) {
+            Ncd metric = new Ncd();
+            double res = metric.ncdSimilarity(programFile, p2File);
+            println(String.format("NCD[%s, %s] Similarity: %f", currentProgram.getName(), p2.getName(), res));
+
+            SimilarityResult fRes = metric.computeSimilarity(currentProgram, p2);
+            fRes.sortBySimilarity();
+            print(fRes.toString());
+        }
+
+        programFile.delete();
+        p2File.delete();
     }
 
 }

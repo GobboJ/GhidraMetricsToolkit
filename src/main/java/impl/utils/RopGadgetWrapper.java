@@ -1,9 +1,7 @@
 package impl.utils;
 
-import ghidra.app.util.exporter.OriginalFileExporter;
-import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
-import ghidra.util.task.TaskMonitor;
+import utils.ProjectUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -16,10 +14,7 @@ import java.util.regex.Pattern;
 public class RopGadgetWrapper {
     public static HashMap<Long, String> getRops(Program program, String depth) throws Exception {
 
-        File f = new File("rop_program.tmp");
-        OriginalFileExporter exporter = new OriginalFileExporter();
-        exporter.export(f, program.getDomainFile().getDomainObject(DomainFile.DEFAULT_VERSION, false, false, TaskMonitor.DUMMY), null, null);
-
+        File f = ProjectUtils.exportProgram(program);
         ProcessBuilder builder = new ProcessBuilder("ROPgadget", "--binary", f.getAbsolutePath(), "--depth", depth);
         Process process = builder.start();
 

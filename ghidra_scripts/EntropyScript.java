@@ -5,6 +5,8 @@
 import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import impl.Entropy;
+import utils.ProjectUtils;
+
 import java.io.File;
 
 
@@ -16,16 +18,7 @@ public class EntropyScript extends GhidraScript {
             printerr("no current program");
             return;
         }
-
-        File programFile = new File(currentProgram.getExecutablePath());
-        if (!programFile.exists()) {
-            if (!isRunningHeadless()) {
-                println("Couldn't find the program file, please choose one:");
-                programFile = askFile("Select program file", "Select File");
-            } else {
-                printerr("Couldn't find the program file, aborting...");
-            }
-        }
+        File programFile = ProjectUtils.exportProgram(currentProgram);
         double res = Entropy.binaryEntropy(programFile);
         printf("Binary Entropy: %.2f\n", res);
 
@@ -33,6 +26,8 @@ public class EntropyScript extends GhidraScript {
         for (Pair<String, Double> section : Entropy.entropyBySection(currentProgram)) {
             printf("\t%s: %.2f\n", section.first, section.second);
         }
+
+        programFile.delete();
     }
 
 }

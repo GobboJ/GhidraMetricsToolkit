@@ -1,9 +1,13 @@
 package gui;
 
 import generic.stl.Pair;
+import ghidra.app.util.exporter.ExporterException;
+import ghidra.util.exception.CancelledException;
+import ghidra.util.exception.VersionException;
 import impl.Entropy;
 import metrics.GhidraMetricsPlugin;
 import resources.Icons;
+import utils.ProjectUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -88,18 +92,22 @@ public class EntropyGui {
             try {
                 int baseValue = Integer.parseInt(baseInput.getText());
 
-                double binaryEntropy = Entropy.binaryEntropy(new File(plugin.getCurrentProgram().getExecutablePath()), baseValue);
-                // TODO Handle executable not found case
+                File programFile = ProjectUtils.exportProgram(plugin.getCurrentProgram());
+                double binaryEntropy = Entropy.binaryEntropy(programFile, baseValue);
                 ArrayList<Pair<String, Double>> res = Entropy.entropyBySection(plugin.getCurrentProgram(), baseValue);
                 for (var l : res) {
                     tableModelProgram.addRow(new Object[]{l.first, l.second});
                 }
                 binaryResult.setText(String.format("%.2f", binaryEntropy));
+                programFile.delete();
             } catch (NumberFormatException ex) {
                 binaryResult.setText("Invalid input");
                 tableModelProgram.setRowCount(0);
             } catch (IOException ex) {
                 binaryResult.setText("Binary not found");
+                tableModelProgram.setRowCount(0);
+            } catch (ExporterException | VersionException | CancelledException ex) {
+                binaryResult.setText("Error exporting program");
                 tableModelProgram.setRowCount(0);
             }
         });

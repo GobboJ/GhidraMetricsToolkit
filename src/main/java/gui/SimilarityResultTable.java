@@ -14,7 +14,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SimilarityResultTable {
@@ -65,8 +64,7 @@ public class SimilarityResultTable {
 
         JScrollPane scrollPane = new JScrollPane(table);
 
-        List<DomainFile> programFiles = new ArrayList<>();
-        ProjectUtils.getProgramList(plugin.getTool().getProject().getProjectData().getRootFolder(), programFiles);
+        List<DomainFile> programFiles = ProjectUtils.getPrograms(plugin.getTool().getProject());
 
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

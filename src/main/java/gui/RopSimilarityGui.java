@@ -9,7 +9,6 @@ import utils.ProjectUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RopSimilarityGui {
@@ -26,8 +25,7 @@ public class RopSimilarityGui {
 
         panel = new JPanel(new BorderLayout());
 
-        List<DomainFile> programFiles = new ArrayList<>();
-        ProjectUtils.getProgramList(plugin.getTool().getProject().getProjectData().getRootFolder(), programFiles);
+        List<DomainFile> programFiles = ProjectUtils.getPrograms(plugin.getTool().getProject());
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
