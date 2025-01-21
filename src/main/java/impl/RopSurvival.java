@@ -1,5 +1,6 @@
 package impl;
 
+import generic.stl.Pair;
 import ghidra.program.model.listing.Program;
 import impl.utils.RopGadgetWrapper;
 
@@ -9,7 +10,7 @@ import java.util.Set;
 
 public class RopSurvival {
 
-    public static double bagOfGadgetsSimilarity(Program program1, Program program2, String depth) throws Exception {
+    private static double bagOfGadgetsSimilarity(Program program1, Program program2, String depth) throws Exception {
         HashMap<Long, String> rops1 = RopGadgetWrapper.getRops(program1, depth);
         HashMap<Long, String> rops2 = RopGadgetWrapper.getRops(program2, depth);
 
@@ -20,7 +21,7 @@ public class RopSurvival {
         return (double) intersection.size() / size;
     }
 
-    public static double survivorSimilarity(Program program1, Program program2, String depth) throws Exception {
+    private static double survivorSimilarity(Program program1, Program program2, String depth) throws Exception {
         HashMap<Long, String> rops1 = RopGadgetWrapper.getRops(program1, depth);
         HashMap<Long, String> rops2 = RopGadgetWrapper.getRops(program2, depth);
 
@@ -28,6 +29,12 @@ public class RopSurvival {
         rops1.entrySet().retainAll(rops2.entrySet());
 
         return (double) rops1.size() / len;
+    }
+
+    public static Pair<Double, Double> ropSimilarity(Program p1, Program p2, String depth) throws Exception {
+        if (p1.getLanguage().getProcessor() != p2.getLanguage().getProcessor())
+            return null;
+        return new Pair<>(bagOfGadgetsSimilarity(p1, p2, depth), survivorSimilarity(p1, p2, depth));
     }
 
 }

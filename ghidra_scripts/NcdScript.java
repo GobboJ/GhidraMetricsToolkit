@@ -48,6 +48,12 @@ public class NcdScript extends GhidraScript {
             println(String.format("NCD[%s, %s] Similarity: %f", currentProgram.getName(), p2.getName(), res));
 
             SimilarityResult fRes = metric.computeSimilarity(currentProgram, p2);
+
+            if (fRes == null) {
+                printerr("The programs have different processors. Aborting");
+                return;
+            }
+
             fRes.sortBySimilarity();
             print(fRes.toString());
         }

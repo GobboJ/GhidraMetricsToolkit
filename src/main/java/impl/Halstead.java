@@ -12,12 +12,17 @@ public class Halstead {
         FunctionIterator functions = program.getFunctionManager().getFunctions(true);
         Result res = new Result(0, 0, 0, 0);
         for (Function f : functions) {
-            res.add(halsteadByFunction(f));
+            Result fRes = halsteadByFunction(f);
+            if (fRes != null)
+                res.add(fRes);
         }
         return res;
     }
 
     public static Result halsteadByFunction(Function function) {
+
+        if (function.isThunk() || function.isExternal())
+            return null;
 
         ArrayList<String> operands = new ArrayList<>();
         ArrayList<String> operators = new ArrayList<>();

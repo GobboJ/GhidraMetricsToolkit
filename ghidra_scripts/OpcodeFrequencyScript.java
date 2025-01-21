@@ -33,6 +33,12 @@ public class OpcodeFrequencyScript extends GhidraScript {
 
         OpcodeFrequency metric = new OpcodeFrequency();
         SimilarityResult r = metric.computeSimilarity(currentProgram, p2);
+
+        if (r == null) {
+            printerr("The programs have different processors. Aborting");
+            return;
+        }
+
         println(String.format("OpFreq[%s, %s] Overall similarity = %.2f", currentProgram.getName(), p2.getName(), r.overallSimilarity()));
         r.sortBySimilarity();
         print(r.toString());

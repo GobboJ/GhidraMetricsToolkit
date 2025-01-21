@@ -1,5 +1,6 @@
 package gui;
 
+import generic.stl.Pair;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
@@ -70,11 +71,11 @@ public class RopSimilarityGui {
                 DomainFile choice = (DomainFile) programChooser.getSelectedItem();
                 if (choice != null) {
                     Program program = ProjectUtils.getProgramFromDomainFile(choice);
-                    double bagofGadgets = RopSurvival.bagOfGadgetsSimilarity(plugin.getCurrentProgram(), program, depthField.getText());
-                    double survivor = RopSurvival.survivorSimilarity(plugin.getCurrentProgram(), program, depthField.getText());
 
-                    bagOfGadgetsResult.setText(bagofGadgets + "");
-                    survivorResult.setText(survivor + "");
+                    Pair<Double, Double> ropSimilarity = RopSurvival.ropSimilarity(plugin.getCurrentProgram(), program, depthField.getText());
+
+                    bagOfGadgetsResult.setText(ropSimilarity.first + "");
+                    survivorResult.setText(ropSimilarity.second + "");
                 }
             } catch (Exception ex) {
                 Msg.showError(getClass(), panel, "Metric computation failed!", ex.getMessage());

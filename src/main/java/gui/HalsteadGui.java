@@ -65,8 +65,10 @@ public class HalsteadGui {
                 Function currentFunction = plugin.getCurrentProgram().getFunctionManager().getFunctionContaining(location.getAddress());
                 if (currentFunction != null) {
                     Halstead.Result resultFunction = Halstead.halsteadByFunction(currentFunction);
-                    for (Object[] row : resultFunction.compute()) {
-                        tableModelFunction.addRow(row);
+                    if (resultFunction != null) {
+                        for (Object[] row : resultFunction.compute()) {
+                            tableModelFunction.addRow(row);
+                        }
                     }
                 }
             }

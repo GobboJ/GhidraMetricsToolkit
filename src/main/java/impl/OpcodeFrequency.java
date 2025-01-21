@@ -42,6 +42,9 @@ public class OpcodeFrequency implements SimilarityInterface {
     @Override
     public SimilarityResult computeSimilarity(Program p1, Program p2) {
 
+        if (p1.getLanguage().getProcessor() != p2.getLanguage().getProcessor())
+            return null;
+
         SimilarityResult result = new SimilarityResult(p1, p2);
         for (Function f_1 : p1.getFunctionManager().getFunctions(true)) {
             if (f_1.isExternal() || f_1.isThunk())

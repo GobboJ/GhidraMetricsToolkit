@@ -23,6 +23,9 @@ public class Lcs implements SimilarityInterface {
     @Override
     public SimilarityResult computeSimilarity(Program p1, Program p2) {
 
+        if (p1.getLanguage().getProcessor() != p2.getLanguage().getProcessor())
+            return null;
+
         SimilarityResult matches = new SimilarityResult(p1, p2);
 
         for (Function f_1 : p1.getFunctionManager().getFunctions(true)) {
