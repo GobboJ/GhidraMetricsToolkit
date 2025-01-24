@@ -91,23 +91,14 @@ public class EntropyGui {
             tableModelProgram.setRowCount(0);
             try {
                 int baseValue = Integer.parseInt(baseInput.getText());
-
-                File programFile = ProjectUtils.exportProgram(plugin.getCurrentProgram());
-                double binaryEntropy = Entropy.binaryEntropy(programFile, baseValue);
-                ArrayList<Pair<String, Double>> res = Entropy.entropyBySection(plugin.getCurrentProgram(), baseValue);
-                for (var l : res) {
+                Entropy entropy = new Entropy(plugin.getCurrentProgram(), baseValue);
+                Entropy.Result result = (Entropy.Result) entropy.compute();
+                for (var l : result.sectionEntropy) {
                     tableModelProgram.addRow(new Object[]{l.first, l.second});
                 }
-                binaryResult.setText(String.format("%.2f", binaryEntropy));
-                programFile.delete();
+                binaryResult.setText(String.format("%.2f", result.binaryEntropy));
             } catch (NumberFormatException ex) {
                 binaryResult.setText("Invalid input");
-                tableModelProgram.setRowCount(0);
-            } catch (IOException ex) {
-                binaryResult.setText("Binary not found");
-                tableModelProgram.setRowCount(0);
-            } catch (ExporterException | VersionException | CancelledException ex) {
-                binaryResult.setText("Error exporting program");
                 tableModelProgram.setRowCount(0);
             }
         });

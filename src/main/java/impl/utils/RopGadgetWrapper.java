@@ -12,10 +12,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RopGadgetWrapper {
-    public static HashMap<Long, String> getRops(Program program, String depth) throws Exception {
+    public static HashMap<Long, String> getRops(Program program, Integer depth) throws Exception {
 
         File f = ProjectUtils.exportProgram(program);
-        ProcessBuilder builder = new ProcessBuilder("ROPgadget", "--binary", f.getAbsolutePath(), "--depth", depth);
+        ProcessBuilder builder = new ProcessBuilder("ROPgadget", "--binary", f.getAbsolutePath(), "--depth", depth.toString());
         Process process = builder.start();
 
         StringBuilder output = new StringBuilder();

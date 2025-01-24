@@ -47,16 +47,12 @@ public class McCabeGui {
         
         button.addActionListener(e -> {
             tableModelProgram.setRowCount(0);
-            try {
-                int complexity = McCabe.computeMcCabe(plugin.getCurrentProgram());
-                complexityResult.setText(Integer.toString(complexity));
+            McCabe mcCabe = new McCabe(plugin.getCurrentProgram());
+            McCabe.Result result = (McCabe.Result) mcCabe.compute();
+            complexityResult.setText(Integer.toString(result.complexity));
 
-                ArrayList<Pair<String, Integer>> res = McCabe.computeFunctions(plugin.getCurrentProgram());
-                for (var l : res) {
-                    tableModelProgram.addRow(new Object[] {l.first, l.second});
-                }
-            } catch (CancelledException ex) {
-                resetTable();
+            for (var l : result.functionComplexity) {
+                tableModelProgram.addRow(new Object[] {l.first, l.second});
             }
         });
         panel.putClientProperty("tableModel", tableModelProgram);

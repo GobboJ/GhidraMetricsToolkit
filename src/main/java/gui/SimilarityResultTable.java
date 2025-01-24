@@ -3,8 +3,7 @@ package gui;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
-import impl.common.SimilarityInterface;
-import impl.common.SimilarityResult;
+import impl.common.*;
 import metrics.GhidraMetricsPlugin;
 import utils.ProjectUtils;
 
@@ -16,14 +15,14 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 
-public class SimilarityResultTable {
+public class SimilarityResultTable<T extends MetricInterface> {
 
     private static final String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
 
     private final JPanel panel;
     private final JComboBox<DomainFile> programChooser;
 
-    public SimilarityResultTable(GhidraMetricsPlugin plugin, SimilarityInterface metric) {
+    public SimilarityResultTable(GhidraMetricsPlugin plugin, SimilarityMetricFactory<T> metricFactory) {
 
         panel = new JPanel(new BorderLayout());
 
@@ -81,7 +80,8 @@ public class SimilarityResultTable {
                 DomainFile choice = (DomainFile) programChooser.getSelectedItem();
                 if (choice != null) {
                     Program program = ProjectUtils.getProgramFromDomainFile(choice);
-                    SimilarityResult result = metric.computeSimilarity(plugin.getCurrentProgram(), program);
+                    T metric = metricFactory.create(plugin.getCurrentProgram(), program);
+                    SimilarityResult result = (SimilarityResult) metric.compute();
                     result.sortBySimilarity();
                     populateTable(result);
                 }

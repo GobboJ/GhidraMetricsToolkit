@@ -16,17 +16,12 @@ public class HalsteadScript extends GhidraScript {
             return;
         }
 
-        Function currentFunction = currentProgram.getFunctionManager().getFunctionAt(currentAddress);
-        if (currentFunction != null) {
-            println("Halstead metrics for function: " + currentFunction.getName());
-            Halstead.Result res = Halstead.halsteadByFunction(currentFunction);
-            if (res != null) {
-                print(res.toString());
-            }
-        }
 
-        println("Halstead metric for whole program");
-        print(Halstead.halsteadByProgram(currentProgram).toString());
+        Function currentFunction = currentProgram.getFunctionManager().getFunctionAt(currentAddress);
+
+        Halstead halstead = new Halstead(currentProgram, currentFunction);
+        Halstead.Result result = (Halstead.Result) halstead.compute();
+        printf(result.toString());
     }
 
 }

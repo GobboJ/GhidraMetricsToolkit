@@ -43,11 +43,11 @@ public class NcdScript extends GhidraScript {
         File programFile = ProjectUtils.exportProgram(currentProgram);
         File p2File = ProjectUtils.exportProgram(p2);
         if (programFile.exists() && p2File.exists()) {
-            Ncd metric = new Ncd();
+            Ncd metric = new Ncd(currentProgram, p2);
             double res = metric.ncdSimilarity(programFile, p2File);
             println(String.format("NCD[%s, %s] Similarity: %f", currentProgram.getName(), p2.getName(), res));
 
-            SimilarityResult fRes = metric.computeSimilarity(currentProgram, p2);
+            SimilarityResult fRes = (SimilarityResult) metric.compute();
 
             if (fRes == null) {
                 printerr("The programs have different processors. Aborting");

@@ -3,7 +3,8 @@ package impl;
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
-import impl.common.SimilarityInterface;
+import impl.common.MetricInterface;
+import impl.common.ResultInterface;
 import impl.common.SimilarityResult;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,16 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class OpcodeFrequency implements SimilarityInterface {
+public class OpcodeFrequency implements MetricInterface {
+
+    private final Program program1;
+    private final Program program2;
+
+    public OpcodeFrequency(Program program1, Program program2) {
+        this.program1 = program1;
+        this.program2 = program2;
+    }
+
 
     private static Map<String, Double> get_histogram(Function function) {
         Map<String, Double> histogram = new HashMap<>();
@@ -40,19 +50,18 @@ public class OpcodeFrequency implements SimilarityInterface {
     }
 
     @Override
-    public SimilarityResult computeSimilarity(Program p1, Program p2) {
-
-        if (p1.getLanguage().getProcessor() != p2.getLanguage().getProcessor())
+    public ResultInterface compute() {
+        if (program1.getLanguage().getProcessor() != program2.getLanguage().getProcessor())
             return null;
 
-        SimilarityResult result = new SimilarityResult(p1, p2);
-        for (Function f_1 : p1.getFunctionManager().getFunctions(true)) {
+        SimilarityResult result = new SimilarityResult(program1, program2);
+        for (Function f_1 : program1.getFunctionManager().getFunctions(true)) {
             if (f_1.isExternal() || f_1.isThunk())
                 continue;
             Map<String, Double> histogram_1 = get_histogram(f_1);
             double min = Double.MAX_VALUE;
             Function f2_min = null;
-            for (Function f_2 : p2.getFunctionManager().getFunctions(true)) {
+            for (Function f_2 : program2.getFunctionManager().getFunctions(true)) {
                 if (f_2.isExternal() || f_2.isThunk())
                     continue;
                 Map<String, Double> histogram_2 = get_histogram(f_2);
@@ -70,5 +79,4 @@ public class OpcodeFrequency implements SimilarityInterface {
 
         return result;
     }
-
 }

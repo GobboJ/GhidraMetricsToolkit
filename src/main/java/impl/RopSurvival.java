@@ -1,40 +1,84 @@
 package impl;
 
-import generic.stl.Pair;
 import ghidra.program.model.listing.Program;
+import impl.common.MetricInterface;
+import impl.common.ResultInterface;
 import impl.utils.RopGadgetWrapper;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class RopSurvival {
+public class RopSurvival implements MetricInterface {
 
-    private static double bagOfGadgetsSimilarity(Program program1, Program program2, String depth) throws Exception {
-        HashMap<Long, String> rops1 = RopGadgetWrapper.getRops(program1, depth);
-        HashMap<Long, String> rops2 = RopGadgetWrapper.getRops(program2, depth);
+    private final Program program1;
+    private final Program program2;
+    private int depth;
 
-        Set<String> intersection = new HashSet<>(rops1.values());
-        int size = intersection.size();
-        intersection.retainAll(rops2.values());
-
-        return (double) intersection.size() / size;
+    public RopSurvival(Program program1, Program program2, int depth) {
+        this.program1 = program1;
+        this.program2 = program2;
+        this.depth = depth;
     }
 
-    private static double survivorSimilarity(Program program1, Program program2, String depth) throws Exception {
-        HashMap<Long, String> rops1 = RopGadgetWrapper.getRops(program1, depth);
-        HashMap<Long, String> rops2 = RopGadgetWrapper.getRops(program2, depth);
-
-        int len = rops1.size();
-        rops1.entrySet().retainAll(rops2.entrySet());
-
-        return (double) rops1.size() / len;
+    public RopSurvival(Program program1, Program program2) {
+        this(program1, program2, 10);
     }
 
-    public static Pair<Double, Double> ropSimilarity(Program p1, Program p2, String depth) throws Exception {
-        if (p1.getLanguage().getProcessor() != p2.getLanguage().getProcessor())
+    public static class Result implements ResultInterface {
+
+        public final double bagOfGadgets;
+        public final double survivor;
+
+        public Result(double bagOfGadgets, double survivor) {
+            this.bagOfGadgets = bagOfGadgets;
+            this.survivor = survivor;
+        }
+
+        @Override
+        public void export() {
+
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Bag of Gadgets: %f\nSurvivor: %f", bagOfGadgets, survivor);
+        }
+    }
+
+    private double bagOfGadgetsSimilarity() {
+        try {
+            HashMap<Long, String> gadgets1 = RopGadgetWrapper.getRops(program1, depth);
+            HashMap<Long, String> gadgets2 = RopGadgetWrapper.getRops(program2, depth);
+
+            Set<String> intersection = new HashSet<>(gadgets1.values());
+            int size = intersection.size();
+            intersection.retainAll(gadgets2.values());
+
+            return (double) intersection.size() / size;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private double survivorSimilarity() {
+        try {
+            HashMap<Long, String> gadgets1 = RopGadgetWrapper.getRops(program1, depth);
+            HashMap<Long, String> gadgets2 = RopGadgetWrapper.getRops(program2, depth);
+
+            int len = gadgets1.size();
+            gadgets1.entrySet().retainAll(gadgets2.entrySet());
+
+            return (double) gadgets1.size() / len;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ResultInterface compute() {
+        if (program1.getLanguage().getProcessor() != program2.getLanguage().getProcessor())
             return null;
-        return new Pair<>(bagOfGadgetsSimilarity(p1, p2, depth), survivorSimilarity(p1, p2, depth));
+        return new Result(bagOfGadgetsSimilarity(), survivorSimilarity());
     }
-
 }

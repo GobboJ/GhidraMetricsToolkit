@@ -2,7 +2,6 @@
 //@author Ca' Foscari - Software Security
 //@category Metrics
 
-import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
 import impl.RopSurvival;
@@ -10,7 +9,7 @@ import utils.ProjectUtils;
 
 public class RopSurvivalScript extends GhidraScript {
 
-    private static final String DEPTH = "10";
+    private static int DEPTH = 10;
 
     @Override
     protected void run() throws Exception {
@@ -33,15 +32,15 @@ public class RopSurvivalScript extends GhidraScript {
             p2 = askProgram("Pick second program");
         }
 
-        Pair<Double, Double> ropSimilarity = RopSurvival.ropSimilarity(currentProgram, p2, DEPTH);
+        RopSurvival ropSurvival = new RopSurvival(currentProgram, p2, DEPTH);
+        RopSurvival.Result result = (RopSurvival.Result) ropSurvival.compute();
 
-        if (ropSimilarity == null) {
+        if (result == null) {
             printerr("The programs have different processors. Aborting");
             return;
         }
 
-        println(String.format("Bag of Gadgets [%s, %s]: %f", currentProgram.getName(), p2.getName(), ropSimilarity.first));
-        println(String.format("Survivor [%s, %s]: %f", currentProgram.getName(), p2.getName(), ropSimilarity.second));
+        printf(result.toString());
     }
 
 }

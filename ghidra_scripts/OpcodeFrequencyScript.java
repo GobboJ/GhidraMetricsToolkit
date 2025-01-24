@@ -31,8 +31,8 @@ public class OpcodeFrequencyScript extends GhidraScript {
             p2 = askProgram("Pick second program");
         }
 
-        OpcodeFrequency metric = new OpcodeFrequency();
-        SimilarityResult r = metric.computeSimilarity(currentProgram, p2);
+        OpcodeFrequency metric = new OpcodeFrequency(currentProgram, p2);
+        SimilarityResult r = (SimilarityResult) metric.compute();
 
         if (r == null) {
             printerr("The programs have different processors. Aborting");

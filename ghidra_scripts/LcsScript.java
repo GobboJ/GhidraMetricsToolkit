@@ -36,8 +36,8 @@ public class LcsScript extends GhidraScript {
             return;
         }
 
-        Lcs metric = new Lcs();
-        SimilarityResult res = metric.computeSimilarity(currentProgram, p2);
+        Lcs metric = new Lcs(currentProgram, p2);
+        SimilarityResult res = (SimilarityResult) metric.compute();
         println(String.format("LCS[%s, %s] Overall similarity = %.2f", currentProgram.getName(), p2.getName(), res.overallSimilarity()));
         res.sortBySimilarity();
         print(res.toString());

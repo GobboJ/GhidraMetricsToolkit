@@ -7,7 +7,12 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class SimilarityResult {
+public class SimilarityResult implements ResultInterface{
+
+    @Override
+    public void export() {
+
+    }
 
     private static class Match {
         Function f1;

@@ -72,10 +72,11 @@ public class RopSimilarityGui {
                 if (choice != null) {
                     Program program = ProjectUtils.getProgramFromDomainFile(choice);
 
-                    Pair<Double, Double> ropSimilarity = RopSurvival.ropSimilarity(plugin.getCurrentProgram(), program, depthField.getText());
+                    RopSurvival ropSurvival = new RopSurvival(plugin.getCurrentProgram(), program);
+                    RopSurvival.Result result = (RopSurvival.Result) ropSurvival.compute();
 
-                    bagOfGadgetsResult.setText(ropSimilarity.first + "");
-                    survivorResult.setText(ropSimilarity.second + "");
+                    bagOfGadgetsResult.setText(result.bagOfGadgets + "");
+                    survivorResult.setText(result.survivor + "");
                 }
             } catch (Exception ex) {
                 Msg.showError(getClass(), panel, "Metric computation failed!", ex.getMessage());

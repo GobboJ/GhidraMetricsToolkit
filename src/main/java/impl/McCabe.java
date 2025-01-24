@@ -11,14 +11,45 @@ import ghidra.program.model.listing.Program;
 import ghidra.program.util.CyclomaticComplexity;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.ConsoleTaskMonitor;
+import impl.common.MetricInterface;
+import impl.common.ResultInterface;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 
-public class McCabe {
+public class McCabe implements MetricInterface {
+
+    private final Program program;
+
+    public McCabe(Program program) {
+        this.program = program;
+    }
+
+    public static class Result implements ResultInterface{
+        public int complexity;
+        public List<Pair<String, Integer>> functionComplexity;
+
+        public Result(int complexity, List<Pair<String, Integer>> functionComplexity) {
+            this.complexity = complexity;
+            this.functionComplexity = functionComplexity;
+        }
+
+        @Override
+        public void export() {
+
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(String.format("Overall Complexity: %d\n", complexity));
+            builder.append("Complexity by Function:\n");
+            for (var f : functionComplexity) {
+                builder.append(String.format("\t%s: %d\n", f.first, f.second));
+            }
+            return builder.toString();
+        }
+    }
 
     private static int countConnectedComponents(GDirectedGraph<String, GEdge<String>> graph) {
         int count = 0;
@@ -55,7 +86,7 @@ public class McCabe {
         return count;
     }
 
-    public static int computeMcCabe(Program program) throws CancelledException {
+    private int computeMcCabe() throws CancelledException {
 
         ConsoleTaskMonitor ctm = new ConsoleTaskMonitor();
         BasicBlockModel bbm = new BasicBlockModel(program);
@@ -102,12 +133,10 @@ public class McCabe {
         int nEdges = graph.getEdgeCount();
         int nComponents = countConnectedComponents(graph);
 
-        int result = nEdges - nVertices + 2 * nComponents;
-        // printf("Complexity[%s]: %d - %d + 2 * %d = %d\n", program.getName(), nEdges, nVertices, nComponents, result);
-        return result;
+        return nEdges - nVertices + 2 * nComponents;
     }
 
-    public static ArrayList<Pair<String, Integer>> computeFunctions(Program program) throws CancelledException {
+    private ArrayList<Pair<String, Integer>> computeFunctions() throws CancelledException {
 
         ArrayList<Pair<String, Integer>> results = new ArrayList<>();
         CyclomaticComplexity cyclomaticComplexity = new CyclomaticComplexity();
@@ -120,4 +149,14 @@ public class McCabe {
         return results;
     }
 
+    @Override
+    public ResultInterface compute() {
+        try {
+            int complexity = computeMcCabe();
+            List<Pair<String, Integer>> functionComplexity = computeFunctions();
+            return new Result(complexity, functionComplexity);
+        } catch (CancelledException e) {
+            return null;
+        }
+    }
 }

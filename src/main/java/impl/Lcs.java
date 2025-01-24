@@ -4,13 +4,21 @@ import generic.algorithms.ReducingListBasedLcs;
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
-import impl.common.SimilarityInterface;
-import impl.common.SimilarityResult;
+import impl.common.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Lcs implements SimilarityInterface {
+public class Lcs implements MetricInterface {
+
+    private final Program program1;
+    private final Program program2;
+
+    public Lcs(Program program1, Program program2) {
+        this.program1 = program1;
+        this.program2 = program2;
+    }
 
     private static List<String> get_opcode_listing(Function function) {
         List<String> listing = new ArrayList<>();
@@ -21,20 +29,19 @@ public class Lcs implements SimilarityInterface {
     }
 
     @Override
-    public SimilarityResult computeSimilarity(Program p1, Program p2) {
-
-        if (p1.getLanguage().getProcessor() != p2.getLanguage().getProcessor())
+    public ResultInterface compute() {
+        if (program1.getLanguage().getProcessor() != program2.getLanguage().getProcessor())
             return null;
 
-        SimilarityResult matches = new SimilarityResult(p1, p2);
+        SimilarityResult matches = new SimilarityResult(program1, program2);
 
-        for (Function f_1 : p1.getFunctionManager().getFunctions(true)) {
+        for (Function f_1 : program1.getFunctionManager().getFunctions(true)) {
             if (f_1.isExternal() || f_1.isThunk())
                 continue;
             double max = 0;
             Function max_2 = null;
             List<String> l_1 = get_opcode_listing(f_1);
-            for (Function f_2 : p2.getFunctionManager().getFunctions(true)) {
+            for (Function f_2 : program2.getFunctionManager().getFunctions(true)) {
                 if (f_2.isExternal() || f_2.isThunk())
                     continue;
                 List<String> l_2 = get_opcode_listing(f_2);
@@ -53,5 +60,4 @@ public class Lcs implements SimilarityInterface {
 
         return matches;
     }
-
 }

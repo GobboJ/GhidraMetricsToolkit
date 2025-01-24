@@ -6,6 +6,7 @@ import gui.*;
 import impl.Lcs;
 import impl.Ncd;
 import impl.OpcodeFrequency;
+import impl.common.SimilarityMetricFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private EntropyGui entropyGui;
     private HalsteadGui halsteadGui;
     private McCabeGui mcCabeGui;
-    private SimilarityResultTable lcsTable;
+    private SimilarityResultTable<Lcs> lcsTable;
     private SimilarityResultTable ncdTable;
     private SimilarityResultTable opcodeFreqTable;
     private RopSimilarityGui ropSimilarityGui;
@@ -43,18 +44,13 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         mcCabeGui = new McCabeGui(plugin);
         tabbedPane.addTab("McCabe", mcCabeGui.getPanel());
 
-        lcsTable = new SimilarityResultTable(plugin, new Lcs());
+        lcsTable = new SimilarityResultTable<>(plugin, Lcs::new);
         tabbedPane.addTab("LCS", lcsTable.getPanel());
 
-        try {
-            ncdTable = new SimilarityResultTable(plugin, new Ncd());
-            tabbedPane.addTab("NCD", ncdTable.getPanel());
-        } catch (OSFileNotFoundException e) {
-            // TODO Handle more gracefully
-            throw new RuntimeException(e);
-        }
+        ncdTable = new SimilarityResultTable<>(plugin, Ncd::new);
+        tabbedPane.addTab("NCD", ncdTable.getPanel());
 
-        opcodeFreqTable = new SimilarityResultTable(plugin, new OpcodeFrequency());
+        opcodeFreqTable = new SimilarityResultTable<>(plugin, OpcodeFrequency::new);
         tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
 
         ropSimilarityGui = new RopSimilarityGui(plugin);

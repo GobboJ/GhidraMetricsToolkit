@@ -14,8 +14,8 @@ public class McCabeScript extends GhidraScript {
             printerr("no current program");
             return;
         }
-        int complexity = McCabe.computeMcCabe(currentProgram);
-        println("Complexity: " + complexity);
-    }
 
+        McCabe complexity = new McCabe(currentProgram);
+        println("Complexity: " + complexity.compute());
+    }
 }

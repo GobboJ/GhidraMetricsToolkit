@@ -1,5 +1,6 @@
 package gui;
 
+import generic.stl.Pair;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.util.ProgramLocation;
@@ -64,10 +65,11 @@ public class HalsteadGui {
             if (location != null) {
                 Function currentFunction = plugin.getCurrentProgram().getFunctionManager().getFunctionContaining(location.getAddress());
                 if (currentFunction != null) {
-                    Halstead.Result resultFunction = Halstead.halsteadByFunction(currentFunction);
-                    if (resultFunction != null) {
-                        for (Object[] row : resultFunction.compute()) {
-                            tableModelFunction.addRow(row);
+                    Halstead halstead = new Halstead(plugin.getCurrentProgram(), currentFunction);
+                    Halstead.Result result = (Halstead.Result) halstead.compute();
+                    if (result != null) {
+                        for (Pair<String, Double> row : result.functionHalstead) {
+                            tableModelFunction.addRow(new Object[] {row.first, row.second});
                         }
                     }
                 }
@@ -82,9 +84,12 @@ public class HalsteadGui {
         if (tableModelProgram != null) {
             tableModelProgram.setRowCount(0);
             if (currentProgram != null) {
-                Halstead.Result resultProgram = Halstead.halsteadByProgram(currentProgram);
-                for (Object[] row : resultProgram.compute()) {
-                    tableModelProgram.addRow(row);
+                Halstead halstead = new Halstead(plugin.getCurrentProgram());
+                Halstead.Result result = (Halstead.Result) halstead.compute();
+                if (result != null) {
+                    for (Pair<String, Double> row : result.halstead) {
+                        tableModelProgram.addRow(new Object[] {row.first, row.second});
+                    }
                 }
             }
         }
