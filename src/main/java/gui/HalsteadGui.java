@@ -87,7 +87,7 @@ public class HalsteadGui {
                 Halstead halstead = new Halstead(plugin.getCurrentProgram());
                 Halstead.Result result = (Halstead.Result) halstead.compute();
                 if (result != null) {
-                    for (Pair<String, Double> row : result.halstead) {
+                    for (Pair<String, Double> row : result.programHalstead) {
                         tableModelProgram.addRow(new Object[] {row.first, row.second});
                     }
                 }

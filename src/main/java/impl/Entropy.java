@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Entropy implements MetricInterface {
@@ -33,17 +34,32 @@ public class Entropy implements MetricInterface {
     }
 
     public static class Result implements ResultInterface {
+        private final Program program;
         public final double binaryEntropy;
         public final ArrayList<Pair<String, Double>> sectionEntropy;
 
-        public Result(double binaryEntropy, ArrayList<Pair<String, Double>> sectionEntropy) {
+        public Result(Program program, double binaryEntropy, ArrayList<Pair<String, Double>> sectionEntropy) {
+            this.program = program;
             this.binaryEntropy = binaryEntropy;
             this.sectionEntropy = sectionEntropy;
         }
 
         @Override
-        public void export() {
+        public List<Pair<String, String>> export() {
+            List<Pair<String, String>> exportedData = new ArrayList<>();
 
+            Pair<String, String> binaryData = new Pair<>("Program,Entropy", program.getName() + "," + binaryEntropy);
+            exportedData.add(binaryData);
+
+            StringBuilder functionEntropyBuilder = new StringBuilder();
+            for (var f : sectionEntropy) {
+                functionEntropyBuilder.append(f.first).append(",").append(f.second);
+            }
+
+            Pair<String, String> functionData = new Pair<>("Function,Entropy", functionEntropyBuilder.toString());
+            exportedData.add(functionData);
+
+            return exportedData;
         }
 
         @Override
@@ -60,7 +76,7 @@ public class Entropy implements MetricInterface {
 
     @Override
     public ResultInterface compute() {
-        return new Result(binaryEntropy(), entropyBySection());
+        return new Result(this.program, binaryEntropy(), entropyBySection());
     }
 
     private ArrayList<Pair<String, Double>> entropyBySection() {

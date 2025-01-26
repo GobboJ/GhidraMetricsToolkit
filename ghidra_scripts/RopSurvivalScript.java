@@ -2,10 +2,15 @@
 //@author Ca' Foscari - Software Security
 //@category Metrics
 
+import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
 import impl.RopSurvival;
+import impl.utils.CsvExporter;
 import utils.ProjectUtils;
+
+import java.io.IOException;
+import java.util.List;
 
 public class RopSurvivalScript extends GhidraScript {
 
@@ -19,11 +24,21 @@ public class RopSurvivalScript extends GhidraScript {
             return;
         }
 
+        String csvPath = null;
+
         Program p2;
         if (isRunningHeadless()) {
             String[] args = getScriptArgs();
-            if (args.length != 1) {
-                printerr("One parameter expected");
+
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("--csv-export")) {
+                    if (args.length > i + 1 && !args[i + 1].startsWith("--")) {
+                        csvPath = args[i + 1];
+                    }
+                }
+            }
+            if (args.length < 1) {
+                printerr("At least one parameter expected");
                 return;
             }
             String programName = args[0];
@@ -39,8 +54,18 @@ public class RopSurvivalScript extends GhidraScript {
             printerr("The programs have different processors. Aborting");
             return;
         }
-
         printf(result.toString());
+
+        if (csvPath != null) {
+            try {
+                List<Pair<String, String>> out = result.export();
+                Pair<String, String> ropResult = out.getFirst();
+                CsvExporter csvExporter = new CsvExporter(csvPath, ropResult.first);
+                csvExporter.exportData(ropResult.second);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

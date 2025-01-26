@@ -1,13 +1,12 @@
 package impl;
 
+import generic.stl.Pair;
 import ghidra.program.model.listing.Program;
 import impl.common.MetricInterface;
 import impl.common.ResultInterface;
 import impl.utils.RopGadgetWrapper;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class RopSurvival implements MetricInterface {
 
@@ -23,27 +22,6 @@ public class RopSurvival implements MetricInterface {
 
     public RopSurvival(Program program1, Program program2) {
         this(program1, program2, 10);
-    }
-
-    public static class Result implements ResultInterface {
-
-        public final double bagOfGadgets;
-        public final double survivor;
-
-        public Result(double bagOfGadgets, double survivor) {
-            this.bagOfGadgets = bagOfGadgets;
-            this.survivor = survivor;
-        }
-
-        @Override
-        public void export() {
-
-        }
-
-        @Override
-        public String toString() {
-            return String.format("Bag of Gadgets: %f\nSurvivor: %f", bagOfGadgets, survivor);
-        }
     }
 
     private double bagOfGadgetsSimilarity() {
@@ -79,6 +57,38 @@ public class RopSurvival implements MetricInterface {
     public ResultInterface compute() {
         if (program1.getLanguage().getProcessor() != program2.getLanguage().getProcessor())
             return null;
-        return new Result(bagOfGadgetsSimilarity(), survivorSimilarity());
+        return new Result(this.program1, this.program2, bagOfGadgetsSimilarity(), survivorSimilarity());
+    }
+
+    public static class Result implements ResultInterface {
+
+        public final double bagOfGadgets;
+        public final double survivor;
+        private final Program program1;
+        private final Program program2;
+
+        public Result(Program program1, Program program2, double bagOfGadgets, double survivor) {
+            this.program1 = program1;
+            this.program2 = program2;
+            this.bagOfGadgets = bagOfGadgets;
+            this.survivor = survivor;
+        }
+
+        @Override
+        public List<Pair<String, String>> export() {
+            List<Pair<String, String>> exportedData = new ArrayList<>();
+
+            String data = program1.getName() + "," +
+                    program2.getName() + "," +
+                    bagOfGadgets + "," +
+                    survivor;
+            exportedData.add(new Pair<>("Program 1,Program 2,BagOfGadgets,Survivor", data));
+            return exportedData;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Bag of Gadgets: %f\nSurvivor: %f", bagOfGadgets, survivor);
+        }
     }
 }

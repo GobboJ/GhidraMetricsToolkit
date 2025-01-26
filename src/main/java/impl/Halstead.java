@@ -32,12 +32,13 @@ public class Halstead implements MetricInterface {
         if (this.function != null) {
             fOps = halsteadByFunction(this.function);
         }
-        return new Result(ops, fOps);
+        return new Result(this.program, ops, fOps);
     }
 
     public static class Result implements ResultInterface {
 
-        public List<Pair<String, Double>> halstead;
+        private final Program program;
+        public List<Pair<String, Double>> programHalstead;
         public List<Pair<String, Double>> functionHalstead;
 
         private List<Pair<String, Double>> generateMetrics(int[] ops) {
@@ -72,9 +73,10 @@ public class Halstead implements MetricInterface {
             return metrics;
         }
 
-        public Result(int[] ops, int[] fOps) {
+        public Result(Program program, int[] ops, int[] fOps) {
+            this.program = program;
             if (ops != null) {
-                halstead = generateMetrics(ops);
+                programHalstead = generateMetrics(ops);
             }
             if (fOps != null) {
                 functionHalstead = generateMetrics(fOps);
@@ -82,15 +84,32 @@ public class Halstead implements MetricInterface {
         }
 
         @Override
-        public void export() {
+        public List<Pair<String, String>> export() {
+            List<Pair<String, String>> exportedData = new ArrayList<>();
 
+            StringBuilder headerStringBuilder = new StringBuilder();
+            StringBuilder dataStringBuilder = new StringBuilder();
+            for (var elem : this.programHalstead) {
+                headerStringBuilder.append(elem.first).append(",");
+                dataStringBuilder.append(elem.second).append(",");
+            }
+
+            exportedData.add(new Pair<>(headerStringBuilder.toString(), dataStringBuilder.toString()));
+
+            dataStringBuilder = new StringBuilder();
+            for (var elem : this.functionHalstead) {
+                dataStringBuilder.append(elem.second).append(",");
+            }
+
+            exportedData.add(new Pair<>(headerStringBuilder.toString(), dataStringBuilder.toString()));
+            return exportedData;
         }
 
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
             builder.append("Program Halstead Metrics:\n");
-            for (var e : halstead) {
+            for (var e : programHalstead) {
                 builder.append(String.format(e.first + ": %15.2f\n", e.second));
             }
             if (functionHalstead != null) {

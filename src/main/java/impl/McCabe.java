@@ -26,17 +26,31 @@ public class McCabe implements MetricInterface {
     }
 
     public static class Result implements ResultInterface{
+        private final Program program;
         public int complexity;
         public List<Pair<String, Integer>> functionComplexity;
 
-        public Result(int complexity, List<Pair<String, Integer>> functionComplexity) {
+        public Result(Program program, int complexity, List<Pair<String, Integer>> functionComplexity) {
+            this.program = program;
             this.complexity = complexity;
             this.functionComplexity = functionComplexity;
         }
 
         @Override
-        public void export() {
+        public List<Pair<String, String>> export() {
+            List<Pair<String, String>> exportedData = new ArrayList<>();
 
+            Pair<String, String> binaryComplexity = new Pair<>("Program,Complexity", this.program.getName() + "," + this.complexity);
+            exportedData.add(binaryComplexity);
+
+            StringBuilder functionStringBuilder = new StringBuilder();
+            for (var elem : functionComplexity) {
+                functionStringBuilder.append(elem.first).append(",").append(elem.second);
+            }
+            Pair<String, String> functionComplexity = new Pair<>("Function,Complexity", functionStringBuilder.toString());
+            exportedData.add(functionComplexity);
+
+            return exportedData;
         }
 
         @Override
@@ -154,7 +168,7 @@ public class McCabe implements MetricInterface {
         try {
             int complexity = computeMcCabe();
             List<Pair<String, Integer>> functionComplexity = computeFunctions();
-            return new Result(complexity, functionComplexity);
+            return new Result(this.program, complexity, functionComplexity);
         } catch (CancelledException e) {
             return null;
         }

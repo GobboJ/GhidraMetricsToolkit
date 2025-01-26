@@ -1,5 +1,9 @@
 package impl.common;
 
+import generic.stl.Pair;
+
+import java.util.List;
+
 public interface ResultInterface {
-    void export();
+    List<Pair<String, String>> export();
 }

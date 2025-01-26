@@ -1,5 +1,6 @@
 package impl.common;
 
+import generic.stl.Pair;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import java.util.ArrayList;
@@ -8,11 +9,6 @@ import java.util.List;
 
 
 public class SimilarityResult implements ResultInterface{
-
-    @Override
-    public void export() {
-
-    }
 
     private static class Match {
         Function f1;
@@ -58,6 +54,12 @@ public class SimilarityResult implements ResultInterface{
             s.add(new Object[] {m.similarity, m.f1.getName(), m.f2.getName()});
         }
         return s;
+    }
+
+    @Override
+    public List<Pair<String, String>> export() {
+
+        return null;
     }
 
     @Override
