@@ -33,7 +33,7 @@ public class McCabeScript extends GhidraScript {
 
         McCabe complexity = new McCabe(currentProgram);
         ResultInterface result = complexity.compute();
-        println("Complexity: " + result);
+        printf(result.toString());
 
         if (csvPath != null) {
             try {

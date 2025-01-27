@@ -32,25 +32,26 @@ public class Halstead implements MetricInterface {
         if (this.function != null) {
             fOps = halsteadByFunction(this.function);
         }
-        return new Result(this.program, ops, fOps);
+        return new Result(this.program, this.function, ops, fOps);
     }
 
     public static class Result implements ResultInterface {
 
         private final Program program;
+        private final Function function;
         public List<Pair<String, Double>> programHalstead;
         public List<Pair<String, Double>> functionHalstead;
 
         private List<Pair<String, Double>> generateMetrics(int[] ops) {
             List<Pair<String, Double>> metrics = new ArrayList<>();
             int n_1 = ops[0];
-            metrics.add(new Pair<>("n_1", (double) n_1));
+            metrics.add(new Pair<>("Dist. Operators (n1)", (double) n_1));
             int n_2 = ops[1];
-            metrics.add(new Pair<>("n_2", (double) n_2));
+            metrics.add(new Pair<>("Dist. Operands (n2)", (double) n_2));
             int N_1 = ops[2];
-            metrics.add(new Pair<>("N_1", (double) N_1));
+            metrics.add(new Pair<>("Tot. Operators (N1)", (double) N_1));
             int N_2 = ops[3];
-            metrics.add(new Pair<>("N_2", (double) N_2));
+            metrics.add(new Pair<>("Tot. Operands (N2)", (double) N_2));
 
             int programVocab = n_1 + n_2;
             metrics.add(new Pair<>("Program Vocabulary (n)", (double) programVocab));
@@ -73,8 +74,9 @@ public class Halstead implements MetricInterface {
             return metrics;
         }
 
-        public Result(Program program, int[] ops, int[] fOps) {
+        public Result(Program program, Function function, int[] ops, int[] fOps) {
             this.program = program;
+            this.function = function;
             if (ops != null) {
                 programHalstead = generateMetrics(ops);
             }
@@ -88,7 +90,10 @@ public class Halstead implements MetricInterface {
             List<Pair<String, String>> exportedData = new ArrayList<>();
 
             StringBuilder headerStringBuilder = new StringBuilder();
+            headerStringBuilder.append("Program,");
+
             StringBuilder dataStringBuilder = new StringBuilder();
+            dataStringBuilder.append(this.program.getName()).append(",");
             for (var elem : this.programHalstead) {
                 headerStringBuilder.append(elem.first).append(",");
                 dataStringBuilder.append(elem.second).append(",");
@@ -96,12 +101,15 @@ public class Halstead implements MetricInterface {
 
             exportedData.add(new Pair<>(headerStringBuilder.toString(), dataStringBuilder.toString()));
 
-            dataStringBuilder = new StringBuilder();
-            for (var elem : this.functionHalstead) {
-                dataStringBuilder.append(elem.second).append(",");
-            }
+            if (this.functionHalstead != null) {
+                dataStringBuilder = new StringBuilder();
+                dataStringBuilder.append(this.function.getName()).append(",");
+                for (var elem : this.functionHalstead) {
+                    dataStringBuilder.append(elem.second).append(",");
+                }
 
-            exportedData.add(new Pair<>(headerStringBuilder.toString(), dataStringBuilder.toString()));
+                exportedData.add(new Pair<>(headerStringBuilder.toString(), dataStringBuilder.toString()));
+            }
             return exportedData;
         }
 

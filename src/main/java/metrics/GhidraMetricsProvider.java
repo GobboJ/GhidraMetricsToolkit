@@ -1,12 +1,10 @@
 package metrics;
 
-import ghidra.framework.OSFileNotFoundException;
 import ghidra.framework.plugintool.ComponentProviderAdapter;
 import gui.*;
 import impl.Lcs;
 import impl.Ncd;
 import impl.OpcodeFrequency;
-import impl.common.SimilarityMetricFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +20,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private SimilarityResultTable<Lcs> lcsTable;
     private SimilarityResultTable ncdTable;
     private SimilarityResultTable opcodeFreqTable;
-    private RopSimilarityGui ropSimilarityGui;
+    private RopSurvivalGui ropSimilarityGui;
 
     public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
         super(ghidraMetricsPlugin.getTool(), pluginName, pluginName);
@@ -53,7 +51,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         opcodeFreqTable = new SimilarityResultTable<>(plugin, OpcodeFrequency::new);
         tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
 
-        ropSimilarityGui = new RopSimilarityGui(plugin);
+        ropSimilarityGui = new RopSurvivalGui(plugin);
         tabbedPane.addTab("ROP", ropSimilarityGui.getPanel());
 
         panel.add(tabbedPane);

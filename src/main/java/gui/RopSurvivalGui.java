@@ -1,6 +1,5 @@
 package gui;
 
-import generic.stl.Pair;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
@@ -12,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class RopSimilarityGui {
+public class RopSurvivalGui {
 
     private final JPanel panel;
     private final GhidraMetricsPlugin plugin;
@@ -21,7 +20,7 @@ public class RopSimilarityGui {
     private final JLabel survivorResult;
     private final JTextField depthField;
 
-    public RopSimilarityGui(GhidraMetricsPlugin plugin) {
+    public RopSurvivalGui(GhidraMetricsPlugin plugin) {
         this.plugin = plugin;
 
         panel = new JPanel(new BorderLayout());

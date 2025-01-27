@@ -12,7 +12,7 @@ public class RopSurvival implements MetricInterface {
 
     private final Program program1;
     private final Program program2;
-    private int depth;
+    private final int depth;
 
     public RopSurvival(Program program1, Program program2, int depth) {
         this.program1 = program1;
