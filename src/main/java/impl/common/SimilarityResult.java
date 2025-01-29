@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class SimilarityResult implements ResultInterface{
+public class SimilarityResult implements ResultInterface {
 
     private static class Match {
         Function f1;
@@ -22,13 +22,16 @@ public class SimilarityResult implements ResultInterface{
         }
     }
 
-    private final List<Match> matches;
     private final Program program1;
     private final Program program2;
+
+    private final List<Match> matches;
+    public Double overallSimilarity;
 
     public SimilarityResult(Program program1, Program program2) {
         this.program1 = program1;
         this.program2 = program2;
+
         matches = new ArrayList<>();
     }
 
@@ -44,8 +47,12 @@ public class SimilarityResult implements ResultInterface{
         matches.sort(Comparator.comparing(m -> m.f1.getName()));
     }
 
-    public double overallSimilarity() {
-        return matches.stream().mapToDouble(m -> m.similarity).sum() / matches.size();
+    public void setOverallSimilarity(double overallSimilarity) {
+        this.overallSimilarity = overallSimilarity;
+    }
+
+    public void calculateOverallSimilarity() {
+        this.overallSimilarity = matches.stream().mapToDouble(m -> m.similarity).sum() / matches.size();
     }
 
     public List<Object[]> getMatches() {
@@ -59,19 +66,42 @@ public class SimilarityResult implements ResultInterface{
     @Override
     public List<Pair<String, String>> export() {
 
-        return null;
+        List<Pair<String, String>> exportedData = new ArrayList<>();
+
+        Pair<String, String> overallSimilarity = new Pair<>("Program 1,Program 2,Similarity",
+                this.program1.getName() + "," + this.program2.getName() + "," + this.overallSimilarity);
+        exportedData.add(overallSimilarity);
+
+        StringBuilder functionSimilarityBuilder = new StringBuilder();
+        for (var m : matches) {
+            functionSimilarityBuilder
+                    .append(m.f1.getName()).append(",")
+                    .append(m.f2.getName()).append(",")
+                    .append(m.similarity);
+        }
+        Pair<String, String> functionSimilarity = new Pair<>("Function 1,Function 2,Similarity", functionSimilarityBuilder.toString());
+        exportedData.add(functionSimilarity);
+
+        return exportedData;
     }
 
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append("Function matching:\n");
-        output.append(String.format("Sim  | %-26s | %-26s\n", program1.getName(), program2.getName()));
-        output.append("--------------------------------------------------------------\n");
-        for (Match m : matches) {
-            output.append(String.format("%.2f | %-26s | %-26s \n", m.similarity, m.f1.getName(), m.f2.getName()));
+
+        if (this.overallSimilarity != null) {
+            output.append(String.format("Overall Similarity [%s, %s]: %f\n", program1.getName(), program2.getName(), overallSimilarity));
         }
-        output.append("--------------------------------------------------------------\n");
+
+        if (!this.matches.isEmpty()) {
+            output.append("Function matching:\n");
+            output.append(String.format("Sim  | %-26s | %-26s\n", program1.getName(), program2.getName()));
+            output.append("--------------------------------------------------------------\n");
+            for (Match m : matches) {
+                output.append(String.format("%.2f | %-26s | %-26s \n", m.similarity, m.f1.getName(), m.f2.getName()));
+            }
+            output.append("--------------------------------------------------------------\n");
+        }
         return output.toString();
     }
 

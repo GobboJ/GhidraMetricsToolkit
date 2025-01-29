@@ -2,14 +2,28 @@
 //@author Ca' Foscari - Software Security
 //@category Metrics
 
+import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
 import impl.OpcodeFrequency;
 import impl.common.SimilarityResult;
+import impl.utils.CsvExporter;
+import picocli.CommandLine;
 import utils.ProjectUtils;
+
+import java.io.IOException;
+import java.util.List;
 
 
 public class OpcodeFrequencyScript extends GhidraScript {
+
+    static class ScriptArgs {
+        @CommandLine.Parameters(index = "0", description = "The program to compare to")
+        String programName;
+
+        @CommandLine.Option(names = "--csv-export", description = "CSV file path to export result")
+        String csvPath;
+    }
 
     @Override
     protected void run() throws Exception {
@@ -18,30 +32,41 @@ public class OpcodeFrequencyScript extends GhidraScript {
             return;
         }
 
-        Program p2;
+        Program program2;
+        String csvPath = null;
+
         if (isRunningHeadless()) {
-            String[] args = getScriptArgs();
-            if (args.length != 1) {
-                printerr("One parameter expected");
-                return;
-            }
-            String programName = args[0];
-            p2 = ProjectUtils.getProgramByName(state.getProject(), programName);
+            ScriptArgs args = new ScriptArgs();
+            CommandLine cmd = new CommandLine(args);
+            cmd.parseArgs(getScriptArgs());
+            program2 = ProjectUtils.getProgramByName(state.getProject(), args.programName);
+            csvPath = args.csvPath;
         } else {
-            p2 = askProgram("Pick second program");
+            program2 = askProgram("Pick second program");
         }
 
-        OpcodeFrequency metric = new OpcodeFrequency(currentProgram, p2);
-        SimilarityResult r = (SimilarityResult) metric.compute();
+        OpcodeFrequency metric = new OpcodeFrequency(currentProgram, program2);
+        SimilarityResult result = (SimilarityResult) metric.compute();
 
-        if (r == null) {
+        if (result == null) {
             printerr("The programs have different processors. Aborting");
             return;
         }
+        result.calculateOverallSimilarity();
+        result.sortBySimilarity();
 
-        println(String.format("OpFreq[%s, %s] Overall similarity = %.2f", currentProgram.getName(), p2.getName(), r.overallSimilarity()));
-        r.sortBySimilarity();
-        print(r.toString());
+        print(result.toString());
+
+        if (csvPath != null) {
+            try {
+                List<Pair<String, String>> out = result.export();
+                Pair<String, String> binaryResult = out.getFirst();
+                CsvExporter csvExporter = new CsvExporter(csvPath, binaryResult.first);
+                csvExporter.exportData(binaryResult.second);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

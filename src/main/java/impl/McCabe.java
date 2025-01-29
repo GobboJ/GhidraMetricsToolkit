@@ -20,9 +20,15 @@ import java.util.*;
 public class McCabe implements MetricInterface {
 
     private final Program program;
+    private final boolean overallOnly;
+
+    public McCabe(Program program, boolean overallOnly) {
+        this.program = program;
+        this.overallOnly = overallOnly;
+    }
 
     public McCabe(Program program) {
-        this.program = program;
+        this(program, false);
     }
 
     public static class Result implements ResultInterface{
@@ -43,13 +49,14 @@ public class McCabe implements MetricInterface {
             Pair<String, String> binaryComplexity = new Pair<>("Program,Complexity", this.program.getName() + "," + this.complexity);
             exportedData.add(binaryComplexity);
 
-            StringBuilder functionStringBuilder = new StringBuilder();
-            for (var elem : functionComplexity) {
-                functionStringBuilder.append(elem.first).append(",").append(elem.second);
+            if (functionComplexity != null) {
+                StringBuilder functionStringBuilder = new StringBuilder();
+                for (var elem : functionComplexity) {
+                    functionStringBuilder.append(elem.first).append(",").append(elem.second);
+                }
+                Pair<String, String> functionComplexity = new Pair<>("Function,Complexity", functionStringBuilder.toString());
+                exportedData.add(functionComplexity);
             }
-            Pair<String, String> functionComplexity = new Pair<>("Function,Complexity", functionStringBuilder.toString());
-            exportedData.add(functionComplexity);
-
             return exportedData;
         }
 
@@ -57,9 +64,12 @@ public class McCabe implements MetricInterface {
         public String toString() {
             StringBuilder builder = new StringBuilder();
             builder.append(String.format("Overall Complexity: %d\n", complexity));
-            builder.append("Complexity by Function:\n");
-            for (var f : functionComplexity) {
-                builder.append(String.format("\t%s: %d\n", f.first, f.second));
+
+            if (functionComplexity != null) {
+                builder.append("Complexity by Function:\n");
+                for (var f : functionComplexity) {
+                    builder.append(String.format("\t%s: %d\n", f.first, f.second));
+                }
             }
             return builder.toString();
         }
@@ -167,7 +177,11 @@ public class McCabe implements MetricInterface {
     public ResultInterface compute() {
         try {
             int complexity = computeMcCabe();
-            List<Pair<String, Integer>> functionComplexity = computeFunctions();
+
+            List<Pair<String, Integer>> functionComplexity = null;
+            if (!overallOnly) {
+                functionComplexity = computeFunctions();
+            }
             return new Result(this.program, complexity, functionComplexity);
         } catch (CancelledException e) {
             return null;

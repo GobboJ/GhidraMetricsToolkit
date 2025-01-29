@@ -76,6 +76,7 @@ public class OpcodeFrequency implements MetricInterface {
                 result.addMatch(f_1, f2_min, 1 - min);
             }
         }
+        result.calculateOverallSimilarity();
 
         return result;
     }

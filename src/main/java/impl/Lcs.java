@@ -57,6 +57,7 @@ public class Lcs implements MetricInterface {
                 matches.addMatch(f_1, max_2, max);
             }
         }
+        matches.calculateOverallSimilarity();
 
         return matches;
     }

@@ -7,12 +7,21 @@ import ghidra.app.script.GhidraScript;
 import impl.Entropy;
 import impl.common.ResultInterface;
 import impl.utils.CsvExporter;
+import picocli.CommandLine;
 
 import java.io.IOException;
 import java.util.List;
 
 
 public class EntropyScript extends GhidraScript {
+
+    static class ScriptArgs {
+        @CommandLine.Option(names = "--csv-export", description = "CSV file path to export result")
+        String csvPath;
+
+        @CommandLine.Option(names = "--base", description = "The logarithm base for the entropy computation (default: 2)")
+        Integer base;
+    }
 
     @Override
     protected void run() {
@@ -21,25 +30,25 @@ public class EntropyScript extends GhidraScript {
             return;
         }
 
-        String csvPath = null;
-        String[] args = getScriptArgs();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--csv-export")) {
-                if (args.length > i + 1 && !args[i + 1].startsWith("--")) {
-                    csvPath = args[i + 1];
-                }
-            }
+        ScriptArgs args = new ScriptArgs();
+        CommandLine cmd = new CommandLine(args);
+        cmd.parseArgs(getScriptArgs());
+
+        Entropy entropy;
+        if (args.base != null) {
+            entropy = new Entropy(currentProgram, args.base);
+        } else {
+            entropy = new Entropy(currentProgram);
         }
 
-        Entropy entropy = new Entropy(currentProgram);
         ResultInterface result = entropy.compute();
         printf(result.toString());
 
-        if (csvPath != null) {
+        if (args.csvPath != null) {
             try {
                 List<Pair<String, String>> out = result.export();
                 Pair<String, String> binaryResult = out.getFirst();
-                CsvExporter csvExporter = new CsvExporter(csvPath, binaryResult.first);
+                CsvExporter csvExporter = new CsvExporter(args.csvPath, binaryResult.first);
                 csvExporter.exportData(binaryResult.second);
             } catch (IOException e) {
                 throw new RuntimeException(e);
