@@ -17,9 +17,9 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private EntropyGui entropyGui;
     private HalsteadGui halsteadGui;
     private McCabeGui mcCabeGui;
-    private SimilarityResultTable<Lcs> lcsTable;
-    private SimilarityResultTable ncdTable;
-    private SimilarityResultTable opcodeFreqTable;
+    private SimilarityGui<Lcs> lcsTable;
+    private SimilarityGui ncdTable;
+    private SimilarityGui opcodeFreqTable;
     private RopSurvivalGui ropSimilarityGui;
 
     public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
@@ -42,13 +42,13 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         mcCabeGui = new McCabeGui(plugin);
         tabbedPane.addTab("McCabe", mcCabeGui.getPanel());
 
-        lcsTable = new SimilarityResultTable<>(plugin, Lcs::new);
+        lcsTable = new SimilarityGui<>(plugin, Lcs::new);
         tabbedPane.addTab("LCS", lcsTable.getPanel());
 
-        ncdTable = new SimilarityResultTable<>(plugin, Ncd::new);
+        ncdTable = new SimilarityGui<>(plugin, Ncd::new);
         tabbedPane.addTab("NCD", ncdTable.getPanel());
 
-        opcodeFreqTable = new SimilarityResultTable<>(plugin, OpcodeFrequency::new);
+        opcodeFreqTable = new SimilarityGui<>(plugin, OpcodeFrequency::new);
         tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
 
         ropSimilarityGui = new RopSurvivalGui(plugin);
@@ -60,9 +60,9 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
 
     public void handleProgramActivated() {
         halsteadGui.populateProgramTable();
-        lcsTable.resetTable();
-        ncdTable.resetTable();
-        opcodeFreqTable.resetTable();
+        lcsTable.resetPanel();
+        ncdTable.resetPanel();
+        opcodeFreqTable.resetPanel();
         entropyGui.resetTable();
         mcCabeGui.resetTable();
         ropSimilarityGui.resetGui();

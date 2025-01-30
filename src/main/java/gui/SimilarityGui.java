@@ -15,14 +15,15 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 
-public class SimilarityResultTable<T extends MetricInterface> {
+public class SimilarityGui<T extends MetricInterface> {
 
     private static final String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
 
     private final JPanel panel;
     private final JComboBox<DomainFile> programChooser;
+    private final JLabel overallSimilarity;
 
-    public SimilarityResultTable(GhidraMetricsPlugin plugin, SimilarityMetricFactory<T> metricFactory) {
+    public SimilarityGui(GhidraMetricsPlugin plugin, SimilarityMetricFactory<T> metricFactory) {
 
         panel = new JPanel(new BorderLayout());
 
@@ -66,7 +67,14 @@ public class SimilarityResultTable<T extends MetricInterface> {
         List<DomainFile> programFiles = ProjectUtils.getPrograms(plugin.getTool().getProject());
 
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel topPanel = new JPanel(new BorderLayout());
+
+        JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel outputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        overallSimilarity = new JLabel("N/A");
+        outputPanel.add(new JLabel("Overall Similarity: "));
+        outputPanel.add(overallSimilarity);
 
 
         programChooser = new JComboBox<>();
@@ -83,16 +91,21 @@ public class SimilarityResultTable<T extends MetricInterface> {
                     T metric = metricFactory.create(plugin.getCurrentProgram(), program);
                     SimilarityResult result = (SimilarityResult) metric.compute();
                     result.sortBySimilarity();
+                    overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
                     populateTable(result);
                 }
             } catch (Exception ex) {
                 Msg.showError(getClass(), panel, "Metric computation failed!", ex.getMessage());
+                overallSimilarity.setText("N/A");
                 programChooser.setSelectedIndex(-1);
             }
         });
 
-        topPanel.add(new JLabel("Compare to: "));
-        topPanel.add(programChooser);
+        inputPanel.add(new JLabel("Compare to: "));
+        inputPanel.add(programChooser);
+
+        topPanel.add(inputPanel, BorderLayout.NORTH);
+        topPanel.add(outputPanel, BorderLayout.CENTER);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -110,12 +123,13 @@ public class SimilarityResultTable<T extends MetricInterface> {
         }
     }
 
-    public void resetTable() {
+    public void resetPanel() {
         DefaultTableModel tableModel = (DefaultTableModel) panel.getClientProperty("tableModel");
         if (tableModel != null) {
             tableModel.setRowCount(0);
             programChooser.setSelectedIndex(-1);
         }
+        overallSimilarity.setText("N/A");
     }
 
     public JPanel getPanel() {
