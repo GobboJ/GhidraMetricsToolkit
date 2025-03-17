@@ -6,6 +6,7 @@ import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
 import impl.OpcodeFrequency;
+import impl.common.Similarity;
 import impl.common.SimilarityResult;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;
@@ -23,6 +24,15 @@ public class OpcodeFrequencyScript extends GhidraScript {
 
         @CommandLine.Option(names = "--csv-export", description = "CSV file path to export result")
         String csvPath;
+
+        @CommandLine.Option(names = "--exclusive", description = "Use exclusive function matching strategy")
+        boolean exclusive;
+
+        @CommandLine.Option(names = "--symmetric", description = "Use symmetric similarity")
+        boolean symmetric;
+
+        @CommandLine.Option(names = "--weighted", description = "Use function weights")
+        boolean weighted;
     }
 
     @Override
@@ -34,6 +44,9 @@ public class OpcodeFrequencyScript extends GhidraScript {
 
         Program program2;
         String csvPath = null;
+        boolean exclusive = false;
+        boolean symmetric = false;
+        boolean weighted = false;
 
         if (isRunningHeadless()) {
             ScriptArgs args = new ScriptArgs();
@@ -41,20 +54,16 @@ public class OpcodeFrequencyScript extends GhidraScript {
             cmd.parseArgs(getScriptArgs());
             program2 = ProjectUtils.getProgramByName(state.getProject(), args.programName);
             csvPath = args.csvPath;
+            exclusive = args.exclusive;
+            symmetric = args.symmetric;
+            weighted = args.weighted;
         } else {
             program2 = askProgram("Pick second program");
         }
 
-        OpcodeFrequency metric = new OpcodeFrequency(currentProgram, program2);
-        SimilarityResult result = (SimilarityResult) metric.compute();
-
-        if (result == null) {
-            printerr("The programs have different processors. Aborting");
-            return;
-        }
-        result.calculateOverallSimilarity();
+        Similarity<OpcodeFrequency> opcodeFreq = new Similarity<>(currentProgram, program2, OpcodeFrequency::new);
+        SimilarityResult result = opcodeFreq.getOverallSimilarity(exclusive, symmetric, weighted);
         result.sortBySimilarity();
-
         print(result.toString());
 
         if (csvPath != null) {

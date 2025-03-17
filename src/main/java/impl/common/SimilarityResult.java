@@ -3,6 +3,7 @@ package impl.common;
 import generic.stl.Pair;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,57 +11,39 @@ import java.util.List;
 
 public class SimilarityResult implements ResultInterface {
 
-    private static class Match {
-        Function f1;
-        Function f2;
-        double similarity;
-
-        public Match(Function f1, Function f2, double similarity) {
-            this.f1 = f1;
-            this.f2 = f2;
-            this.similarity = similarity;
-        }
-    }
-
     private final Program program1;
     private final Program program2;
-
-    private final List<Match> matches;
+    private final List<FunctionSimilarity> functionSimilarities;
     public Double overallSimilarity;
 
     public SimilarityResult(Program program1, Program program2) {
         this.program1 = program1;
         this.program2 = program2;
 
-        matches = new ArrayList<>();
+        functionSimilarities = new ArrayList<>();
     }
 
-    public void addMatch(Function f1, Function f2, double similarity) {
-        matches.add(new Match(f1, f2, similarity));
-    }
-
-    public void sortBySimilarity() {
-        matches.sort(Comparator.comparingDouble(m -> -m.similarity));
-    }
-
-    public void sortByName() {
-        matches.sort(Comparator.comparing(m -> m.f1.getName()));
+    public void addFunctionSimilarity(Function f1, Function f2, Double similarity) {
+        functionSimilarities.add(new FunctionSimilarity(f1, f2, similarity));
     }
 
     public void setOverallSimilarity(double overallSimilarity) {
         this.overallSimilarity = overallSimilarity;
     }
 
-    public void calculateOverallSimilarity() {
-        this.overallSimilarity = matches.stream().mapToDouble(m -> m.similarity).sum() / matches.size();
-    }
-
-    public List<Object[]> getMatches() {
+    public List<Object[]> getFunctionSimilarities() {
         List<Object[]> s = new ArrayList<>();
-        for (Match m : matches) {
-            s.add(new Object[] {m.similarity, m.f1.getName(), m.f2.getName()});
+        for (FunctionSimilarity m : functionSimilarities) {
+//            String similarity = (m.similarity != null) ? String.format("%.2f", m.similarity) : "----";
+            String function1 = (m.f1 != null) ? m.f1.getName() : "--";
+            String function2 = (m.f2 != null) ? m.f2.getName() : "--";
+            s.add(new Object[]{m.similarity, function1, function2});
         }
         return s;
+    }
+
+    public void sortBySimilarity() {
+        functionSimilarities.sort(Comparator.comparing(m -> m.similarity, Comparator.nullsLast(Comparator.reverseOrder())));
     }
 
     @Override
@@ -68,16 +51,15 @@ public class SimilarityResult implements ResultInterface {
 
         List<Pair<String, String>> exportedData = new ArrayList<>();
 
-        Pair<String, String> overallSimilarity = new Pair<>("Program 1,Program 2,Similarity",
-                this.program1.getName() + "," + this.program2.getName() + "," + this.overallSimilarity);
+        Pair<String, String> overallSimilarity = new Pair<>("Program 1,Program 2,Similarity", this.program1.getName() + "," + this.program2.getName() + "," + this.overallSimilarity);
         exportedData.add(overallSimilarity);
 
         StringBuilder functionSimilarityBuilder = new StringBuilder();
-        for (var m : matches) {
-            functionSimilarityBuilder
-                    .append(m.f1.getName()).append(",")
-                    .append(m.f2.getName()).append(",")
-                    .append(m.similarity);
+        for (var m : functionSimilarities) {
+            String similarity = (m.similarity != null) ? String.format("%.2f", m.similarity) : "----";
+            String function1 = (m.f1 != null) ? m.f1.getName() : "--";
+            String function2 = (m.f2 != null) ? m.f2.getName() : "--";
+            functionSimilarityBuilder.append(function1).append(",").append(function2).append(",").append(similarity);
         }
         Pair<String, String> functionSimilarity = new Pair<>("Function 1,Function 2,Similarity", functionSimilarityBuilder.toString());
         exportedData.add(functionSimilarity);
@@ -93,16 +75,31 @@ public class SimilarityResult implements ResultInterface {
             output.append(String.format("Overall Similarity [%s, %s]: %f\n", program1.getName(), program2.getName(), overallSimilarity));
         }
 
-        if (!this.matches.isEmpty()) {
+        if (!this.functionSimilarities.isEmpty()) {
             output.append("Function matching:\n");
             output.append(String.format("Sim  | %-26s | %-26s\n", program1.getName(), program2.getName()));
             output.append("--------------------------------------------------------------\n");
-            for (Match m : matches) {
-                output.append(String.format("%.2f | %-26s | %-26s \n", m.similarity, m.f1.getName(), m.f2.getName()));
+            for (FunctionSimilarity m : functionSimilarities) {
+                String similarity = (m.similarity != null) ? String.format("%.2f", m.similarity) : "----";
+                String function1 = (m.f1 != null) ? m.f1.getName() : "--";
+                String function2 = (m.f2 != null) ? m.f2.getName() : "--";
+                output.append(String.format("%s | %-26s | %-26s \n", similarity, function1, function2));
             }
             output.append("--------------------------------------------------------------\n");
         }
         return output.toString();
+    }
+
+    public static class FunctionSimilarity {
+        public Function f1;
+        public Function f2;
+        public Double similarity;
+
+        public FunctionSimilarity(Function f1, Function f2, Double similarity) {
+            this.f1 = f1;
+            this.f2 = f2;
+            this.similarity = similarity;
+        }
     }
 
 }

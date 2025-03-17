@@ -105,7 +105,7 @@ public class Ncd implements MetricInterface {
                     }
                 }
                 if (max > 0) {
-                    result.addMatch(f_1, max_2, max);
+                    result.addFunctionSimilarity(f_1, max_2, max);
                 }
             }
         }

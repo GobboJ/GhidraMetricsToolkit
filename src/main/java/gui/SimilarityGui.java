@@ -13,14 +13,18 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.List;
 
-public class SimilarityGui<T extends MetricInterface> {
+public class SimilarityGui<T extends SimilarityInterface> {
 
     private static final String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
 
     private final JPanel panel;
     private final JComboBox<DomainFile> programChooser;
+    private final JCheckBox exclusive;
+    private final JCheckBox weighted;
+    private final JCheckBox symmetric;
     private final JLabel overallSimilarity;
 
     public SimilarityGui(GhidraMetricsPlugin plugin, SimilarityMetricFactory<T> metricFactory) {
@@ -45,6 +49,7 @@ public class SimilarityGui<T extends MetricInterface> {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (value instanceof Double) {
+
                     double doubleValue = (Double) value;
 
                     int red = (int) ((1.0 - doubleValue) * 255);
@@ -55,8 +60,15 @@ public class SimilarityGui<T extends MetricInterface> {
 
                     c.setBackground(new Color(red, green, blue));
                     c.setForeground(Color.BLACK);
+
                 }
-                setText(value instanceof Double ? formatter.format(value) : value.toString());
+                if (value != null)
+                    setText(value instanceof Double ? formatter.format(value) : value.toString());
+                else {
+                    c.setBackground(Color.WHITE);
+                    setText("------");
+                }
+
                 return c;
             }
         };
@@ -68,6 +80,17 @@ public class SimilarityGui<T extends MetricInterface> {
 
 
         JPanel topPanel = new JPanel(new BorderLayout());
+
+        JPanel leftTopPanel = new JPanel(new BorderLayout());
+        JPanel rightTopPanel = new JPanel(new FlowLayout());
+
+        exclusive = new JCheckBox("Exclusive");
+        weighted = new JCheckBox("Weighted");
+        symmetric = new JCheckBox("Symmetric");
+
+        rightTopPanel.add(exclusive);
+        rightTopPanel.add(weighted);
+        rightTopPanel.add(symmetric);
 
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JPanel outputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -88,14 +111,14 @@ public class SimilarityGui<T extends MetricInterface> {
                 DomainFile choice = (DomainFile) programChooser.getSelectedItem();
                 if (choice != null) {
                     Program program = ProjectUtils.getProgramFromDomainFile(choice);
-                    T metric = metricFactory.create(plugin.getCurrentProgram(), program);
-                    SimilarityResult result = (SimilarityResult) metric.compute();
+                    Similarity<T> similarity = new Similarity<>(plugin.getCurrentProgram(), program, metricFactory);
+                    SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
                     result.sortBySimilarity();
                     overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
                     populateTable(result);
                 }
             } catch (Exception ex) {
-                Msg.showError(getClass(), panel, "Metric computation failed!", ex.getMessage());
+                Msg.showError(getClass(), panel, "Metric computation failed!", Arrays.toString(ex.getStackTrace()));
                 overallSimilarity.setText("N/A");
                 programChooser.setSelectedIndex(-1);
             }
@@ -104,8 +127,11 @@ public class SimilarityGui<T extends MetricInterface> {
         inputPanel.add(new JLabel("Compare to: "));
         inputPanel.add(programChooser);
 
-        topPanel.add(inputPanel, BorderLayout.NORTH);
-        topPanel.add(outputPanel, BorderLayout.CENTER);
+        leftTopPanel.add(inputPanel, BorderLayout.NORTH);
+        leftTopPanel.add(outputPanel, BorderLayout.CENTER);
+
+        topPanel.add(leftTopPanel, BorderLayout.WEST);
+        topPanel.add(rightTopPanel, BorderLayout.EAST);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -117,7 +143,7 @@ public class SimilarityGui<T extends MetricInterface> {
         DefaultTableModel tableModel = (DefaultTableModel) panel.getClientProperty("tableModel");
         if (tableModel != null) {
             tableModel.setRowCount(0);
-            for (Object[] row : result.getMatches()) {
+            for (Object[] row : result.getFunctionSimilarities()) {
                 tableModel.addRow(row);
             }
         }
@@ -130,6 +156,9 @@ public class SimilarityGui<T extends MetricInterface> {
             programChooser.setSelectedIndex(-1);
         }
         overallSimilarity.setText("N/A");
+        exclusive.setSelected(false);
+        weighted.setSelected(false);
+        symmetric.setSelected(false);
     }
 
     public JPanel getPanel() {

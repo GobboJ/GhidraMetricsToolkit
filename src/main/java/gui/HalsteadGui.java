@@ -67,7 +67,7 @@ public class HalsteadGui {
                 if (currentFunction != null) {
                     Halstead halstead = new Halstead(plugin.getCurrentProgram(), currentFunction);
                     Halstead.Result result = (Halstead.Result) halstead.compute();
-                    if (result != null) {
+                    if (result != null && result.functionHalstead != null) {
                         for (Pair<String, Double> row : result.functionHalstead) {
                             tableModelFunction.addRow(new Object[] {row.first, row.second});
                         }

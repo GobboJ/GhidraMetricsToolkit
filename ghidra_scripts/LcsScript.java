@@ -6,11 +6,12 @@ import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
 import impl.Lcs;
+import impl.common.Similarity;
 import impl.common.SimilarityResult;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;
-import utils.ProjectUtils;
 import picocli.CommandLine.Parameters;
+import utils.ProjectUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,18 +24,30 @@ public class LcsScript extends GhidraScript {
 
         @CommandLine.Option(names = "--csv-export", description = "CSV file path to export result")
         String csvPath;
+
+        @CommandLine.Option(names = "--exclusive", description = "Use exclusive function matching strategy")
+        boolean exclusive;
+
+        @CommandLine.Option(names = "--symmetric", description = "Use symmetric similarity")
+        boolean symmetric;
+
+        @CommandLine.Option(names = "--weighted", description = "Use function weights")
+        boolean weighted;
     }
 
     @Override
     protected void run() throws Exception {
 
         if (currentProgram == null) {
-            printerr("no current program");
+            printerr("~ current program");
             return;
         }
 
         Program program2;
         String csvPath = null;
+        boolean exclusive = false;
+        boolean symmetric = false;
+        boolean weighted = false;
 
         if (isRunningHeadless()) {
             ScriptArgs args = new ScriptArgs();
@@ -42,14 +55,17 @@ public class LcsScript extends GhidraScript {
             cmd.parseArgs(getScriptArgs());
             program2 = ProjectUtils.getProgramByName(state.getProject(), args.programName);
             csvPath = args.csvPath;
+            exclusive = args.exclusive;
+            symmetric = args.symmetric;
+            weighted = args.weighted;
         } else {
             program2 = askProgram("Pick second program");
         }
 
-        Lcs metric = new Lcs(currentProgram, program2);
-        SimilarityResult result = (SimilarityResult) metric.compute();
+        Similarity<Lcs> lcs = new Similarity<>(currentProgram, program2, Lcs::new);
+        SimilarityResult result = lcs.getOverallSimilarity(exclusive, weighted, symmetric);
         result.sortBySimilarity();
-        printf(result.toString());
+        print(result.toString());
 
         if (csvPath != null) {
             try {
