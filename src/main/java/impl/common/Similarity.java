@@ -2,6 +2,7 @@ package impl.common;
 
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
+import impl.Ncd;
 import utils.HungarianAlgorithm;
 
 import java.util.ArrayList;
@@ -176,9 +177,19 @@ public class Similarity<T extends SimilarityInterface> {
         return result;
     }
 
+    // TODO Try other exclusive weighted method
     public SimilarityResult getOverallSimilarity(boolean exclusive, boolean weighted, boolean symmetric) {
-        // TODO Try other exclusive weighted method
-        return (exclusive) ? exclusiveMatching(weighted, symmetric) : nonExclusiveMatching(weighted, symmetric);
-    }
+        SimilarityResult result = (exclusive) ? exclusiveMatching(weighted, symmetric) : nonExclusiveMatching(weighted, symmetric);
 
+        // Override overall similarity result for NCD metric
+        if (metric instanceof Ncd) {
+            try {
+                double overallSimilarity = ((Ncd) metric).computeBinarySimilarity(program1, program2);
+                result.setOverallSimilarity(overallSimilarity);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return result;
+    }
 }

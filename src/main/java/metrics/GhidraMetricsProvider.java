@@ -18,7 +18,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private HalsteadGui halsteadGui;
     private McCabeGui mcCabeGui;
     private SimilarityGui<Lcs> lcsTable;
-    private SimilarityGui ncdTable;
+    private SimilarityGui<Ncd> ncdTable;
     private SimilarityGui<OpcodeFrequency> opcodeFreqTable;
     private RopSurvivalGui ropSimilarityGui;
 
@@ -45,9 +45,8 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         lcsTable = new SimilarityGui<>(plugin, Lcs::new);
         tabbedPane.addTab("LCS", lcsTable.getPanel());
 
-        // TODO Fix NCD
-//        ncdTable = new SimilarityGui<>(plugin, Ncd::new);
-//        tabbedPane.addTab("NCD", ncdTable.getPanel());
+        ncdTable = new SimilarityGui<>(plugin, Ncd::new);
+        tabbedPane.addTab("NCD", ncdTable.getPanel());
 
         opcodeFreqTable = new SimilarityGui<>(plugin, OpcodeFrequency::new);
         tabbedPane.addTab("Opcode Freq", opcodeFreqTable.getPanel());
@@ -62,7 +61,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     public void handleProgramActivated() {
         halsteadGui.populateProgramTable();
         lcsTable.resetPanel();
-        //ncdTable.resetPanel();
+        ncdTable.resetPanel();
         opcodeFreqTable.resetPanel();
         entropyGui.resetTable();
         mcCabeGui.resetTable();

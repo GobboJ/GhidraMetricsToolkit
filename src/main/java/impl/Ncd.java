@@ -6,39 +6,37 @@ import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryAccessException;
-import impl.common.MetricInterface;
-import impl.common.ResultInterface;
-import impl.common.SimilarityResult;
+import impl.common.SimilarityInterface;
 import impl.utils.LrzipWrapper;
 import utils.ProjectUtils;
 
 import java.io.File;
 
 
-public class Ncd implements MetricInterface {
+public class Ncd implements SimilarityInterface {
 
     private final String lrzipPath;
 
-    private final Program program1;
-    private final Program program2;
-    private final boolean binaryOnly;
-
-    public Ncd(Program program1, Program program2, boolean binaryOnly) {
+    public Ncd() {
         try {
             lrzipPath = Application.getOSFile("GhidraMetrics", "lrzip").getPath();
         } catch (OSFileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        this.program1 = program1;
-        this.program2 = program2;
-        this.binaryOnly = binaryOnly;
     }
 
-    public Ncd(Program program1, Program program2) {
-        this(program1, program2, false);
+    private static byte[] getFunctionBytes(Function function) {
+        Memory memory = function.getProgram().getMemory();
+        byte[] functionBytes = new byte[(int) function.getBody().getNumAddresses()];
+        try {
+            memory.getBytes(function.getEntryPoint(), functionBytes);
+        } catch (MemoryAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return functionBytes;
     }
 
-    private double ncdSimilarity() throws Exception {
+    public double computeBinarySimilarity(Program program1, Program program2) throws Exception {
 
         File f1 = ProjectUtils.exportProgram(program1);
         File f2 = ProjectUtils.exportProgram(program2);
@@ -55,61 +53,20 @@ public class Ncd implements MetricInterface {
         return Math.clamp(value, 0, 1);
     }
 
-    private static byte[] getFunctionBytes(Function function) {
-        Memory memory = function.getProgram().getMemory();
-        byte[] functionBytes = new byte[(int) function.getBody().getNumAddresses()];
-        try {
-            memory.getBytes(function.getEntryPoint(), functionBytes);
-        } catch (MemoryAccessException e) {
-            throw new RuntimeException(e);
-        }
-        return functionBytes;
-    }
-
     @Override
-    public ResultInterface compute() {
-        SimilarityResult result = new SimilarityResult(program1, program2);
+    public double compute(Function function1, Function function2) {
+        byte[] f1Bytes = getFunctionBytes(function1);
+        byte[] f2Bytes = getFunctionBytes(function2);
 
+        LrzipWrapper lrzipWrapper = new LrzipWrapper(lrzipPath);
         try {
-            result.setOverallSimilarity(ncdSimilarity());
+            long size1 = lrzipWrapper.measure(f1Bytes);
+            long size2 = lrzipWrapper.measure(f2Bytes);
+            long sizeConcat = lrzipWrapper.measure(f1Bytes, f2Bytes);
+
+            return Math.clamp(1 - (double) (sizeConcat - Math.min(size1, size2)) / Math.max(size1, size2), 0, 1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        if (!this.binaryOnly) {
-            for (Function f_1 : program1.getFunctionManager().getFunctions(true)) {
-                if (f_1.isExternal() || f_1.isThunk())
-                    continue;
-                byte[] f1Bytes = getFunctionBytes(f_1);
-                double max = 0;
-                Function max_2 = null;
-                for (Function f_2 : program2.getFunctionManager().getFunctions(true)) {
-                    if (f_2.isExternal() || f_2.isThunk())
-                        continue;
-                    byte[] f2Bytes = getFunctionBytes(f_2);
-
-                    LrzipWrapper lrzipWrapper = new LrzipWrapper(lrzipPath);
-                    try {
-                        long size1 = lrzipWrapper.measure(f1Bytes);
-                        long size2 = lrzipWrapper.measure(f2Bytes);
-                        long sizeConcat = lrzipWrapper.measure(f1Bytes, f2Bytes);
-
-                        double sim = 1 - (double) (sizeConcat - Math.min(size1, size2)) / Math.max(size1, size2);
-
-                        if (sim >= max) {
-                            max = sim;
-                            max_2 = f_2;
-                        }
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                if (max > 0) {
-                    result.addFunctionSimilarity(f_1, max_2, max);
-                }
-            }
-        }
-
-        return result;
     }
 }
