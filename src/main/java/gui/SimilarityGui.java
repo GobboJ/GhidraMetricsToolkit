@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SimilarityGui<T extends SimilarityInterface> {
 
-    private static final String[] columnNames = {"Simil.", "Current Program", "Compared Program"};
+    private static final String[] columnNames = {"Simil.", "Weight", "Current Program", "Compared Program"};
 
     private final JPanel panel;
     private final JComboBox<DomainFile> programChooser;
@@ -70,13 +70,14 @@ public class SimilarityGui<T extends SimilarityInterface> {
                     setText(value instanceof Double ? formatter.format(value) : value.toString());
                 else {
                     c.setBackground(Color.WHITE);
-                    setText("------");
+                    setText("―");
                 }
 
                 return c;
             }
         };
         table.getColumnModel().getColumn(0).setCellRenderer(doubleRenderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(doubleRenderer);
 
         JScrollPane scrollPane = new JScrollPane(table);
 

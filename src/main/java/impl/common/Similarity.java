@@ -90,8 +90,13 @@ public class Similarity<T extends SimilarityInterface> {
                     maxIndex = j;
                 }
             }
-            result.addFunctionSimilarity(functions1.get(i), functions2.get(maxIndex), maxSimilarity);
-            overallSimilarity += maxSimilarity * ((weighted) ? weights1.get(i) : 1);
+            if (weighted) {
+                result.addFunctionSimilarity(functions1.get(i), functions2.get(maxIndex), maxSimilarity, weights1.get(i));
+                overallSimilarity += maxSimilarity * weights1.get(i);
+            } else {
+                result.addFunctionSimilarity(functions1.get(i), functions2.get(maxIndex), maxSimilarity);
+                overallSimilarity += maxSimilarity;
+            }
         }
         if (!weighted) {
             overallSimilarity /= functions1.size();
@@ -146,10 +151,10 @@ public class Similarity<T extends SimilarityInterface> {
             for (int i = 0; i < matches.length; i++) {
                 if (i < similarity.length) {
                     if (matches[i] >= 0 && matches[i] < similarity[0].length) {
-                        result.addFunctionSimilarity(functions1.get(i), functions2.get(matches[i]), similarity[i][matches[i]]);
+                        result.addFunctionSimilarity(functions1.get(i), functions2.get(matches[i]), similarity[i][matches[i]], weights1.get(i));
                         overallSimilarity += weightedSimilarity[i][matches[i]];
                     } else {
-                        result.addFunctionSimilarity(functions1.get(i), null, null);
+                        result.addFunctionSimilarity(functions1.get(i), null, null, weights1.get(i));
                     }
                 } else {
                     result.addFunctionSimilarity(null, functions2.get(matches[i]), null);

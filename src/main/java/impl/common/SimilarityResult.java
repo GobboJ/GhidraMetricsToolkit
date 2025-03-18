@@ -27,6 +27,10 @@ public class SimilarityResult implements ResultInterface {
         functionSimilarities.add(new FunctionSimilarity(f1, f2, similarity));
     }
 
+    public void addFunctionSimilarity(Function f1, Function f2, Double similarity, Double weight) {
+        functionSimilarities.add(new FunctionSimilarity(f1, f2, similarity, weight));
+    }
+
     public void setOverallSimilarity(double overallSimilarity) {
         this.overallSimilarity = overallSimilarity;
     }
@@ -35,9 +39,9 @@ public class SimilarityResult implements ResultInterface {
         List<Object[]> s = new ArrayList<>();
         for (FunctionSimilarity m : functionSimilarities) {
 //            String similarity = (m.similarity != null) ? String.format("%.2f", m.similarity) : "----";
-            String function1 = (m.f1 != null) ? m.f1.getName() : "--";
-            String function2 = (m.f2 != null) ? m.f2.getName() : "--";
-            s.add(new Object[]{m.similarity, function1, function2});
+            String function1 = (m.f1 != null) ? m.f1.getName() : "―";
+            String function2 = (m.f2 != null) ? m.f2.getName() : "―";
+            s.add(new Object[]{m.similarity, m.weight, function1, function2});
         }
         return s;
     }
@@ -94,11 +98,17 @@ public class SimilarityResult implements ResultInterface {
         public Function f1;
         public Function f2;
         public Double similarity;
+        public Double weight;
 
-        public FunctionSimilarity(Function f1, Function f2, Double similarity) {
+        public FunctionSimilarity(Function f1, Function f2, Double similarity, Double weight) {
             this.f1 = f1;
             this.f2 = f2;
             this.similarity = similarity;
+            this.weight = weight;
+        }
+
+        public FunctionSimilarity(Function f1, Function f2, Double similarity) {
+            this(f1, f2, similarity, null);
         }
     }
 
