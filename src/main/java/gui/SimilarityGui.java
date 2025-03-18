@@ -12,6 +12,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +28,8 @@ public class SimilarityGui<T extends SimilarityInterface> {
     private final JCheckBox weighted;
     private final JCheckBox symmetric;
     private final JLabel overallSimilarity;
+
+    private Similarity<T> similarity;
 
     public SimilarityGui(GhidraMetricsPlugin plugin, SimilarityMetricFactory<T> metricFactory) {
 
@@ -106,12 +110,13 @@ public class SimilarityGui<T extends SimilarityInterface> {
         }
         programChooser.setSelectedIndex(-1);
         programChooser.setVisible(true);
+
         programChooser.addActionListener(e -> {
             try {
                 DomainFile choice = (DomainFile) programChooser.getSelectedItem();
                 if (choice != null) {
                     Program program = ProjectUtils.getProgramFromDomainFile(choice);
-                    Similarity<T> similarity = new Similarity<>(plugin.getCurrentProgram(), program, metricFactory);
+                    similarity = new Similarity<>(plugin.getCurrentProgram(), program, metricFactory);
                     SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
                     result.sortBySimilarity();
                     overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
@@ -119,10 +124,24 @@ public class SimilarityGui<T extends SimilarityInterface> {
                 }
             } catch (Exception ex) {
                 Msg.showError(getClass(), panel, "Metric computation failed!", Arrays.toString(ex.getStackTrace()));
+                similarity = null;
                 overallSimilarity.setText("N/A");
                 programChooser.setSelectedIndex(-1);
             }
         });
+
+        ActionListener checkBoxHandler = e -> {
+            if (programChooser.getSelectedIndex() >= 0 && similarity != null) {
+                SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
+                result.sortBySimilarity();
+                overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
+                populateTable(result);
+            }
+        };
+
+        exclusive.addActionListener(checkBoxHandler);
+        weighted.addActionListener(checkBoxHandler);
+        symmetric.addActionListener(checkBoxHandler);
 
         inputPanel.add(new JLabel("Compare to: "));
         inputPanel.add(programChooser);
