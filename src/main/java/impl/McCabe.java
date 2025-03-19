@@ -63,13 +63,18 @@ public class McCabe implements MetricInterface {
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
+            builder.append(String.format("McCabe Complexity [%s]:\n", program.getName()));
             builder.append(String.format("Overall Complexity: %d\n", complexity));
 
             if (functionComplexity != null) {
-                builder.append("Complexity by Function:\n");
+                int maxLength = functionComplexity.stream().mapToInt(p -> p.first.length()).max().orElse(20);
+                builder.append("-".repeat(maxLength)).append("-+-").append("-".repeat(10)).append("\n");
+                builder.append(String.format("%" + maxLength + "s | %s\n", "Function", "Complexity"));
+                builder.append("-".repeat(maxLength)).append("-+-").append("-".repeat(10)).append("\n");
                 for (var f : functionComplexity) {
-                    builder.append(String.format("\t%s: %d\n", f.first, f.second));
+                    builder.append(String.format("%" + maxLength + "s | %d\n", f.first, f.second));
                 }
+                builder.append("-".repeat(maxLength)).append("-+-").append("-".repeat(10)).append("\n");
             }
             return builder.toString();
         }

@@ -7,6 +7,7 @@ import ghidra.program.model.listing.Program;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 
 public class SimilarityResult implements ResultInterface {
@@ -80,14 +81,21 @@ public class SimilarityResult implements ResultInterface {
         }
 
         if (!this.functionSimilarities.isEmpty()) {
+            boolean hasWeights = functionSimilarities.stream().map(a -> a.weight).anyMatch(Objects::nonNull);
+            String headerFormat = (hasWeights) ? "Sim  | Weight | %-26s | %-26s\n" : "Sim  | %-26s | %-26s\n";
+            String dataFormat = (hasWeights) ? "%s | %6s | %-26s | %-26s \n" : "%s | %-26s | %-26s \n";
             output.append("Function matching:\n");
-            output.append(String.format("Sim  | %-26s | %-26s\n", program1.getName(), program2.getName()));
+            output.append(String.format(headerFormat, program1.getName(), program2.getName()));
             output.append("--------------------------------------------------------------\n");
             for (FunctionSimilarity m : functionSimilarities) {
                 String similarity = (m.similarity != null) ? String.format("%.2f", m.similarity) : "----";
+                String weight = (m.weight != null) ? String.format("%.2f", m.weight) : "----";
                 String function1 = (m.f1 != null) ? m.f1.getName() : "--";
                 String function2 = (m.f2 != null) ? m.f2.getName() : "--";
-                output.append(String.format("%s | %-26s | %-26s \n", similarity, function1, function2));
+                if (hasWeights)
+                    output.append(String.format(dataFormat, similarity, weight, function1, function2));
+                else
+                    output.append(String.format(dataFormat, similarity, function1, function2));
             }
             output.append("--------------------------------------------------------------\n");
         }

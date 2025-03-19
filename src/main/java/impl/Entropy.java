@@ -64,13 +64,21 @@ public class Entropy implements MetricInterface {
 
         @Override
         public String toString() {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(String.format("Binary Entropy: %.2f\n", binaryEntropy));
-            stringBuilder.append("Entropy by section:\n");
+            StringBuilder builder = new StringBuilder();
+            builder.append(String.format("Entropy [%s]:\n", program.getName()));
+            builder.append(String.format("Binary Entropy: %.2f\n", binaryEntropy));
+
+            int maxLength = sectionEntropy.stream().mapToInt(p -> p.first.length()).max().orElse(20);
+            builder.append("Entropy by section:\n");
+            builder.append("-".repeat(maxLength)).append("-+-").append("-".repeat(10)).append("\n");
+            builder.append(String.format("%" + maxLength + "s | %s\n", "Entropy", "Section"));
+            builder.append("-".repeat(maxLength)).append("-+-").append("-".repeat(10)).append("\n");
+
             for (Pair<String, Double> section : sectionEntropy) {
-                stringBuilder.append(String.format("\t%s: %.2f\n", section.first, section.second));
+                builder.append(String.format("%" + maxLength + "s | %.2f\n", section.first, section.second));
             }
-            return stringBuilder.toString();
+            builder.append("-".repeat(maxLength)).append("-+-").append("-".repeat(10)).append("\n");
+            return builder.toString();
         }
     }
 

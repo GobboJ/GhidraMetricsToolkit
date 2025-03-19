@@ -88,7 +88,7 @@ public class RopSurvival implements MetricInterface {
 
         @Override
         public String toString() {
-            return String.format("Bag of Gadgets: %f\nSurvivor: %f", bagOfGadgets, survivor);
+            return String.format("ROP Survival [%s, %s]:\nBag of Gadgets: %.2f\nSurvivor: %.2f\n", program1.getName(), program2.getName(), bagOfGadgets, survivor);
         }
     }
 }

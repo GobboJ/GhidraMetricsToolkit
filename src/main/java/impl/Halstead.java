@@ -116,15 +116,26 @@ public class Halstead implements MetricInterface {
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
+            builder.append(String.format("Halstead Metrics [%s]\n", program.getName()));
             builder.append("Program Halstead Metrics:\n");
+
+            builder.append("-".repeat(22)).append("-+-").append("-".repeat(10)).append("\n");
+            builder.append(String.format("%22s | %s\n", "Metric", "Value"));
+            builder.append("-".repeat(22)).append("-+-").append("-".repeat(10)).append("\n");
             for (var e : programHalstead) {
-                builder.append(String.format(e.first + ": %15.2f\n", e.second));
+                builder.append(String.format("%22s | %10.2f\n", e.first, e.second));
             }
+            builder.append("-".repeat(22)).append("-+-").append("-".repeat(10)).append("\n");
+
             if (functionHalstead != null) {
                 builder.append("Function Halstead Metrics:\n");
+                builder.append("-".repeat(22)).append("-+-").append("-".repeat(10)).append("\n");
+                builder.append(String.format("%22s | %s\n", "Metric", "Value"));
+                builder.append("-".repeat(22)).append("-+-").append("-".repeat(10)).append("\n");
                 for (var e : functionHalstead) {
-                    builder.append(String.format(e.first + ": %15.2f\n", e.second));
+                    builder.append(String.format("%22s | %10.2f\n", e.first, e.second));
                 }
+                builder.append("-".repeat(22)).append("-+-").append("-".repeat(10)).append("\n");
             }
             return builder.toString();
         }
