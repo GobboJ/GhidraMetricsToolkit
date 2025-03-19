@@ -169,7 +169,7 @@ public class Similarity<T extends SimilarityInterface> {
                         inverseWeightedSimilarity[i][j] = similarity[i][j] * weights2.get(j);
                     }
                 }
-                int[] inverseMatches = HungarianAlgorithm.compute(weightedSimilarity);
+                int[] inverseMatches = HungarianAlgorithm.compute(inverseWeightedSimilarity);
                 for (int i = 0; i < similarity.length; i++) {
                     if (inverseMatches[i] >= 0 && inverseMatches[i] < similarity[0].length)
                         inverseSimilarity += inverseWeightedSimilarity[i][matches[i]];
