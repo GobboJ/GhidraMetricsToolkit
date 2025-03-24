@@ -5,7 +5,7 @@ import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
 import impl.metrics.RopSurvival;
 import metrics.GhidraMetricsPlugin;
-import utils.ProjectUtils;
+import impl.utils.ProjectUtils;
 
 import javax.swing.*;
 import java.awt.*;

@@ -9,7 +9,7 @@ import ghidra.util.exception.CancelledException;
 import ghidra.util.exception.VersionException;
 import impl.common.MetricInterface;
 import impl.common.ResultInterface;
-import utils.ProjectUtils;
+import impl.utils.ProjectUtils;
 
 import java.io.File;
 import java.io.IOException;

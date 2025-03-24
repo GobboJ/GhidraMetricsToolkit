@@ -11,7 +11,7 @@ import impl.common.SimilarityResult;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;
 import picocli.CommandLine.Parameters;
-import utils.ProjectUtils;
+import impl.utils.ProjectUtils;
 
 import java.io.IOException;
 import java.util.List;

@@ -4,11 +4,10 @@ import ghidra.framework.Application;
 import ghidra.framework.OSFileNotFoundException;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
-import ghidra.program.model.mem.Memory;
-import ghidra.program.model.mem.MemoryAccessException;
 import impl.common.SimilarityInterface;
+import impl.utils.FunctionUtils;
 import impl.utils.LrzipWrapper;
-import utils.ProjectUtils;
+import impl.utils.ProjectUtils;
 
 import java.io.File;
 
@@ -23,17 +22,6 @@ public class Ncd implements SimilarityInterface {
         } catch (OSFileNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static byte[] getFunctionBytes(Function function) {
-        Memory memory = function.getProgram().getMemory();
-        byte[] functionBytes = new byte[(int) function.getBody().getNumAddresses()];
-        try {
-            memory.getBytes(function.getEntryPoint(), functionBytes);
-        } catch (MemoryAccessException e) {
-            throw new RuntimeException(e);
-        }
-        return functionBytes;
     }
 
     public double computeBinarySimilarity(Program program1, Program program2) throws Exception {
@@ -55,8 +43,8 @@ public class Ncd implements SimilarityInterface {
 
     @Override
     public double compute(Function function1, Function function2) {
-        byte[] f1Bytes = getFunctionBytes(function1);
-        byte[] f2Bytes = getFunctionBytes(function2);
+        byte[] f1Bytes = FunctionUtils.getFunctionBytes(function1);
+        byte[] f2Bytes = FunctionUtils.getFunctionBytes(function2);
 
         LrzipWrapper lrzipWrapper = new LrzipWrapper(lrzipPath);
         try {

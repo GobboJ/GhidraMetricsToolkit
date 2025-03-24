@@ -1,7 +1,6 @@
 package impl.utils;
 
 import ghidra.program.model.listing.Program;
-import utils.ProjectUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package utils;
+package impl.utils;
 
 import ghidra.app.util.exporter.ExporterException;
 import ghidra.app.util.exporter.OriginalFileExporter;
