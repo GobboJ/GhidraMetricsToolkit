@@ -2,9 +2,7 @@ package metrics;
 
 import ghidra.framework.plugintool.ComponentProviderAdapter;
 import gui.*;
-import impl.metrics.Lcs;
-import impl.metrics.Ncd;
-import impl.metrics.OpcodeFrequency;
+import impl.metrics.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +18,9 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private SimilarityGui<Lcs> lcsTable;
     private SimilarityGui<Ncd> ncdTable;
     private SimilarityGui<OpcodeFrequency> opcodeFreqTable;
+    private SimilarityGui<Jaccard> jaccardTable;
+    private SimilarityGui<JaroWinkler> jaroWinklerTable;
+    private SimilarityGui<Levenshtein> levenshteinTable;
     private RopSurvivalGui ropSimilarityGui;
 
     public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
@@ -54,6 +55,15 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         ropSimilarityGui = new RopSurvivalGui(plugin);
         tabbedPane.addTab("ROP", ropSimilarityGui.getPanel());
 
+        jaccardTable = new SimilarityGui<>(plugin, Jaccard::new);
+        tabbedPane.addTab("Jaccard", jaccardTable.getPanel());
+
+        jaroWinklerTable = new SimilarityGui<>(plugin, JaroWinkler::new);
+        tabbedPane.addTab("Jaro-Winkler", jaroWinklerTable.getPanel());
+
+        levenshteinTable = new SimilarityGui<>(plugin, Levenshtein::new);
+        tabbedPane.addTab("Levenshtein", levenshteinTable.getPanel());
+
         panel.add(tabbedPane);
         setVisible(true);
     }
@@ -66,6 +76,9 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         entropyGui.resetTable();
         mcCabeGui.resetTable();
         ropSimilarityGui.resetGui();
+        jaccardTable.resetPanel();
+        jaroWinklerTable.resetPanel();
+        levenshteinTable.resetPanel();
     }
 
     public void handleLocationChanged() {

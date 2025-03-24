@@ -172,7 +172,7 @@ public class Similarity<T extends SimilarityInterface> {
                 int[] inverseMatches = HungarianAlgorithm.compute(inverseWeightedSimilarity);
                 for (int i = 0; i < similarity.length; i++) {
                     if (inverseMatches[i] >= 0 && inverseMatches[i] < similarity[0].length)
-                        inverseSimilarity += inverseWeightedSimilarity[i][matches[i]];
+                        inverseSimilarity += inverseWeightedSimilarity[i][inverseMatches[i]];
                 }
 
                 overallSimilarity = (overallSimilarity + inverseSimilarity) / 2;
