@@ -3,7 +3,7 @@ package gui;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
-import impl.RopSurvival;
+import impl.metrics.RopSurvival;
 import metrics.GhidraMetricsPlugin;
 import utils.ProjectUtils;
 

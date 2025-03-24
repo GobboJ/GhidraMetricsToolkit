@@ -1,4 +1,4 @@
-package impl;
+package impl.metrics;
 
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;

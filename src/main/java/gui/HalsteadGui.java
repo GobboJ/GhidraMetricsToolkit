@@ -4,7 +4,7 @@ import generic.stl.Pair;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.util.ProgramLocation;
-import impl.Halstead;
+import impl.metrics.Halstead;
 import metrics.GhidraMetricsPlugin;
 
 import javax.swing.*;

@@ -5,7 +5,7 @@
 import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
-import impl.Ncd;
+import impl.metrics.Ncd;
 import impl.common.Similarity;
 import impl.common.SimilarityResult;
 import impl.utils.CsvExporter;

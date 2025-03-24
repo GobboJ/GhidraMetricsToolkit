@@ -1,8 +1,6 @@
 package gui;
 
-import generic.stl.Pair;
-import ghidra.util.exception.CancelledException;
-import impl.McCabe;
+import impl.metrics.McCabe;
 import metrics.GhidraMetricsPlugin;
 import resources.Icons;
 
@@ -10,7 +8,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class McCabeGui {
 

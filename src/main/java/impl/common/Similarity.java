@@ -2,7 +2,7 @@ package impl.common;
 
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
-import impl.Ncd;
+import impl.metrics.Ncd;
 import utils.HungarianAlgorithm;
 
 import java.util.ArrayList;

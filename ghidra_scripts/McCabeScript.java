@@ -4,7 +4,7 @@
 
 import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
-import impl.McCabe;
+import impl.metrics.McCabe;
 import impl.common.ResultInterface;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;

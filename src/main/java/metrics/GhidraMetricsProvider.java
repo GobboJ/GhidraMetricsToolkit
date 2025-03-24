@@ -2,9 +2,9 @@ package metrics;
 
 import ghidra.framework.plugintool.ComponentProviderAdapter;
 import gui.*;
-import impl.Lcs;
-import impl.Ncd;
-import impl.OpcodeFrequency;
+import impl.metrics.Lcs;
+import impl.metrics.Ncd;
+import impl.metrics.OpcodeFrequency;
 
 import javax.swing.*;
 import java.awt.*;

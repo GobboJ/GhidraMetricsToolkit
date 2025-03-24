@@ -1,4 +1,4 @@
-package impl;
+package impl.metrics;
 
 import generic.stl.Pair;
 import ghidra.graph.GDirectedGraph;

@@ -1,11 +1,7 @@
-//Computes the Opcode Frequency Similarity between two programs
-//@author Ca' Foscari - Software Security
-//@category Metrics
-
 import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
-import impl.metrics.OpcodeFrequency;
+import impl.metrics.Jaccard;
 import impl.common.Similarity;
 import impl.common.SimilarityResult;
 import impl.utils.CsvExporter;
@@ -15,8 +11,7 @@ import utils.ProjectUtils;
 import java.io.IOException;
 import java.util.List;
 
-
-public class OpcodeFrequencyScript extends GhidraScript {
+public class JaccardScript extends GhidraScript {
 
     static class ScriptArgs {
         @CommandLine.Parameters(index = "0", description = "The program to compare to")
@@ -38,7 +33,7 @@ public class OpcodeFrequencyScript extends GhidraScript {
     @Override
     protected void run() throws Exception {
         if (currentProgram == null) {
-            printerr("no current program");
+            printerr("~ current program");
             return;
         }
 
@@ -49,7 +44,7 @@ public class OpcodeFrequencyScript extends GhidraScript {
         boolean weighted = false;
 
         if (isRunningHeadless()) {
-            ScriptArgs args = new ScriptArgs();
+            JaroWinklerScript.ScriptArgs args = new JaroWinklerScript.ScriptArgs();
             CommandLine cmd = new CommandLine(args);
             cmd.parseArgs(getScriptArgs());
             program2 = ProjectUtils.getProgramByName(state.getProject(), args.programName);
@@ -61,8 +56,8 @@ public class OpcodeFrequencyScript extends GhidraScript {
             program2 = askProgram("Pick second program");
         }
 
-        Similarity<OpcodeFrequency> opcodeFreq = new Similarity<>(currentProgram, program2, OpcodeFrequency::new);
-        SimilarityResult result = opcodeFreq.getOverallSimilarity(exclusive, weighted, symmetric);
+        Similarity<Jaccard> jaccardSimilarity = new Similarity<>(currentProgram, program2, Jaccard::new);
+        SimilarityResult result = jaccardSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
         result.sortBySimilarity();
         print(result.toString());
 
@@ -77,5 +72,4 @@ public class OpcodeFrequencyScript extends GhidraScript {
             }
         }
     }
-
 }

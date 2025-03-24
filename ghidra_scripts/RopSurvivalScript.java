@@ -5,7 +5,7 @@
 import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Program;
-import impl.RopSurvival;
+import impl.metrics.RopSurvival;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;
 import utils.ProjectUtils;

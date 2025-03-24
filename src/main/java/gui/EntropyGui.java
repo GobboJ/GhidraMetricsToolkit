@@ -1,23 +1,15 @@
 package gui;
 
-import generic.stl.Pair;
-import ghidra.app.util.exporter.ExporterException;
-import ghidra.util.exception.CancelledException;
-import ghidra.util.exception.VersionException;
-import impl.Entropy;
+import impl.metrics.Entropy;
 import metrics.GhidraMetricsPlugin;
 import resources.Icons;
-import utils.ProjectUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 public class EntropyGui {
 

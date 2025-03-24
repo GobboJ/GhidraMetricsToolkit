@@ -59,6 +59,7 @@ dependencies {
 	// Any external dependencies added here will automatically be copied to the lib/ directory when
 	// this extension is built.
     implementation 'info.picocli:picocli:4.7.6'
+    implementation 'org.apache.commons:commons-text:1.13.0'
 }
 
 // Exclude additional files from the built extension

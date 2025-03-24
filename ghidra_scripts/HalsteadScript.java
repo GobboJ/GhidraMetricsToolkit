@@ -5,7 +5,7 @@
 import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.*;
-import impl.Halstead;
+import impl.metrics.Halstead;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;
 

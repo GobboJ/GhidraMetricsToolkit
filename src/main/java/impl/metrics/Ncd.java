@@ -1,4 +1,4 @@
-package impl;
+package impl.metrics;
 
 import ghidra.framework.Application;
 import ghidra.framework.OSFileNotFoundException;
