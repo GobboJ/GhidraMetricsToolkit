@@ -25,8 +25,8 @@ public class NcdScript extends GhidraScript {
         @CommandLine.Option(names = "--csv-export", description = "CSV file path to export result")
         String csvPath;
 
-//        @CommandLine.Option(names = "--binary-only", description = "Only compute overall binary similarity")
-//        boolean binaryOnly;
+        @CommandLine.Option(names = "--binary-only", description = "Only compute overall binary similarity")
+        boolean binaryOnly;
 
         @CommandLine.Option(names = "--exclusive", description = "Use exclusive function matching strategy")
         boolean exclusive;
@@ -62,7 +62,7 @@ public class NcdScript extends GhidraScript {
 
             p2 = ProjectUtils.getProgramByName(state.getProject(), args.programName);
             csvPath = args.csvPath;
-//            binaryOnly = args.binaryOnly;
+            binaryOnly = args.binaryOnly;
             exclusive = args.exclusive;
             symmetric = args.symmetric;
             weighted = args.weighted;
@@ -76,25 +76,35 @@ public class NcdScript extends GhidraScript {
             return;
         }
 
-        Similarity<Ncd> ncdSimilarity = new Similarity<>(currentProgram, p2, Ncd::new);
-        SimilarityResult result = ncdSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
+        if (!binaryOnly) {
+            Similarity<Ncd> ncdSimilarity = new Similarity<>(currentProgram, p2, Ncd::new);
+            SimilarityResult result = ncdSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
 
-        if (result == null) {
-            printerr("The programs have different processors. Aborting");
-            return;
-        }
+            if (result == null) {
+                printerr("The programs have different processors. Aborting");
+                return;
+            }
 
-        result.sortBySimilarity();
-        print(result.toString());
+            result.sortBySimilarity();
+            print(result.toString());
 
-        if (csvPath != null) {
-            try {
-                List<Pair<String, String>> out = result.export();
-                Pair<String, String> binaryResult = out.getFirst();
-                CsvExporter csvExporter = new CsvExporter(csvPath, binaryResult.first);
-                csvExporter.exportData(binaryResult.second);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (csvPath != null) {
+                try {
+                    List<Pair<String, String>> out = result.export();
+                    Pair<String, String> binaryResult = out.getFirst();
+                    CsvExporter csvExporter = new CsvExporter(csvPath, binaryResult.first);
+                    csvExporter.exportData(binaryResult.second);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            Ncd ncd = new Ncd();
+            double res = ncd.computeBinarySimilarity(currentProgram, p2);
+
+            if (csvPath != null) {
+                CsvExporter csvExporter = new CsvExporter(csvPath, "Program 1,Program 2,Similarity");
+                csvExporter.exportData(currentProgram.getName() + "," + p2.getName() + "," + res);
             }
         }
     }

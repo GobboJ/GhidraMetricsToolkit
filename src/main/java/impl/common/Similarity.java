@@ -85,7 +85,7 @@ public class Similarity<T extends SimilarityInterface> {
             double maxSimilarity = 0;
             int maxIndex = -1;
             for (int j = 0; j < functions2.size(); j++) {
-                if (similarity[i][j] > maxSimilarity) {
+                if (similarity[i][j] >= maxSimilarity) {
                     maxSimilarity = similarity[i][j];
                     maxIndex = j;
                 }
