@@ -2,6 +2,8 @@ package impl.utils;
 
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
+import ghidra.program.model.listing.FunctionIterator;
+import ghidra.program.model.listing.Program;
 import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryAccessException;
 import org.apache.commons.text.similarity.SimilarityInput;
@@ -34,6 +36,15 @@ public class FunctionUtils {
             throw new RuntimeException(e);
         }
         return functionBytes;
+    }
+
+    public static Function getFunctionByName(Program program, String functionName) {
+        FunctionIterator functions = program.getFunctionManager().getFunctions(true);
+        for (Function f : functions) {
+            if (f.getName().equals(functionName))
+                return f;
+        }
+        return null;
     }
 
     public static Map<String, Double> getHistogram(Function function) {

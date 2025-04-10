@@ -1,9 +1,12 @@
 package gui;
 
+import ghidra.app.services.GoToService;
 import ghidra.framework.model.DomainFile;
+import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
 import impl.common.*;
+import impl.utils.FunctionUtils;
 import metrics.GhidraMetricsPlugin;
 import impl.utils.ProjectUtils;
 
@@ -83,6 +86,25 @@ public class SimilarityGui<T extends SimilarityInterface> {
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setMinWidth(50);
         table.getColumnModel().getColumn(1).setMaxWidth(100);
+
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+                    int row = table.rowAtPoint(e.getPoint());
+                    int column = table.columnAtPoint(e.getPoint());
+
+                    if (row != -1 && column == 2) {
+                        String functionName = (String) table.getValueAt(row, column);
+                        Function function = FunctionUtils.getFunctionByName(plugin.getCurrentProgram(), functionName);
+                        if (function != null) {
+                            GoToService goToService = plugin.getTool().getService(GoToService.class);
+                            goToService.goTo(function.getEntryPoint());
+                        }
+                    }
+                }
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(table);
 
