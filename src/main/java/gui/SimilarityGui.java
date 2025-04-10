@@ -77,6 +77,12 @@ public class SimilarityGui<T extends SimilarityInterface> {
         };
         table.getColumnModel().getColumn(0).setCellRenderer(doubleRenderer);
         table.getColumnModel().getColumn(1).setCellRenderer(doubleRenderer);
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        table.getColumnModel().getColumn(0).setMinWidth(50);
+        table.getColumnModel().getColumn(0).setMaxWidth(100);
+        table.getColumnModel().getColumn(1).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setMinWidth(50);
+        table.getColumnModel().getColumn(1).setMaxWidth(100);
 
         JScrollPane scrollPane = new JScrollPane(table);
 
