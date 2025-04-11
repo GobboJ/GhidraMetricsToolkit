@@ -77,7 +77,7 @@ public class NcdScript extends GhidraScript {
         }
 
         if (!binaryOnly) {
-            Similarity<Ncd> ncdSimilarity = new Similarity<>(currentProgram, p2, Ncd::new);
+            Similarity ncdSimilarity = new Similarity(currentProgram, p2, new Ncd());
             SimilarityResult result = ncdSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
 
             if (result == null) {

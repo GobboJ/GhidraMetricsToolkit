@@ -56,7 +56,7 @@ public class LevenshteinScript extends GhidraScript {
             program2 = askProgram("Pick second program");
         }
 
-        Similarity<Levenshtein> levenshteinSimilarity = new Similarity<>(currentProgram, program2, Levenshtein::new);
+        Similarity levenshteinSimilarity = new Similarity(currentProgram, program2, new Levenshtein());
         SimilarityResult result = levenshteinSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
         result.sortBySimilarity();
         print(result.toString());

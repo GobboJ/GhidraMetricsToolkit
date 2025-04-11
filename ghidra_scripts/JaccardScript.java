@@ -44,7 +44,7 @@ public class JaccardScript extends GhidraScript {
         boolean weighted = false;
 
         if (isRunningHeadless()) {
-            JaroWinklerScript.ScriptArgs args = new JaroWinklerScript.ScriptArgs();
+            ScriptArgs args = new ScriptArgs();
             CommandLine cmd = new CommandLine(args);
             cmd.parseArgs(getScriptArgs());
             program2 = ProjectUtils.getProgramByName(state.getProject(), args.programName);
@@ -56,7 +56,7 @@ public class JaccardScript extends GhidraScript {
             program2 = askProgram("Pick second program");
         }
 
-        Similarity<Jaccard> jaccardSimilarity = new Similarity<>(currentProgram, program2, Jaccard::new);
+        Similarity jaccardSimilarity = new Similarity(currentProgram, program2, new Jaccard());
         SimilarityResult result = jaccardSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
         result.sortBySimilarity();
         print(result.toString());

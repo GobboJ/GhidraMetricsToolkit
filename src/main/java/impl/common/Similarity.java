@@ -8,7 +8,7 @@ import impl.utils.HungarianAlgorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Similarity<T extends SimilarityInterface> {
+public class Similarity {
 
     private final double[][] similarity;
     private final List<Double> weights1;
@@ -17,9 +17,9 @@ public class Similarity<T extends SimilarityInterface> {
     private final List<Function> functions2;
     private final Program program1;
     private final Program program2;
-    private final T metric;
+    private final SimilarityInterface metric;
 
-    public Similarity(Program program1, Program program2, SimilarityMetricFactory<T> metricFactory) {
+    public Similarity(Program program1, Program program2, SimilarityInterface metric) {
 
         this.program1 = program1;
         this.program2 = program2;
@@ -63,7 +63,7 @@ public class Similarity<T extends SimilarityInterface> {
         }
 
         similarity = new double[functions1.size()][functions2.size()];
-        metric = metricFactory.create();
+        this.metric = metric;
 
         computePairwiseSimilarity();
     }

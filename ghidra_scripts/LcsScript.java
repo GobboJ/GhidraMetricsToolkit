@@ -62,7 +62,7 @@ public class LcsScript extends GhidraScript {
             program2 = askProgram("Pick second program");
         }
 
-        Similarity<Lcs> lcs = new Similarity<>(currentProgram, program2, Lcs::new);
+        Similarity lcs = new Similarity(currentProgram, program2, new Lcs());
         SimilarityResult result = lcs.getOverallSimilarity(exclusive, weighted, symmetric);
         result.sortBySimilarity();
         print(result.toString());

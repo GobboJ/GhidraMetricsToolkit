@@ -14,6 +14,7 @@ import java.io.File;
 
 public class Ncd implements SimilarityInterface {
 
+    private static final String NAME = "Normalized Compression Distance";
     private final String lrzipPath;
 
     public Ncd() {
@@ -56,5 +57,10 @@ public class Ncd implements SimilarityInterface {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return NAME;
     }
 }

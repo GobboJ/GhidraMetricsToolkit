@@ -56,7 +56,7 @@ public class JaroWinklerScript extends GhidraScript {
             program2 = askProgram("Pick second program");
         }
 
-        Similarity<JaroWinkler> jaroWinklerSimilarity = new Similarity<>(currentProgram, program2, JaroWinkler::new);
+        Similarity jaroWinklerSimilarity = new Similarity(currentProgram, program2, new JaroWinkler());
         SimilarityResult result = jaroWinklerSimilarity.getOverallSimilarity(exclusive, weighted, symmetric);
         result.sortBySimilarity();
         print(result.toString());

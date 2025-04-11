@@ -5,10 +5,13 @@ import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
-import impl.common.*;
+import impl.common.Similarity;
+import impl.common.SimilarityInterface;
+import impl.common.SimilarityResult;
+import impl.metrics.*;
 import impl.utils.FunctionUtils;
-import metrics.GhidraMetricsPlugin;
 import impl.utils.ProjectUtils;
+import metrics.GhidraMetricsPlugin;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -20,20 +23,25 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
-public class SimilarityGui<T extends SimilarityInterface> {
+public class SimilarityGui {
 
     private static final String[] columnNames = {"Simil.", "Weight", "Current Program", "Compared Program"};
-
+    private static final SimilarityInterface[] metrics = {new Jaccard(), new JaroWinkler(), new Levenshtein(), new Lcs(), new Ncd(), new OpcodeFrequency()};
     private final JPanel panel;
+    private final JComboBox<SimilarityInterface> metricChooser;
     private final JComboBox<DomainFile> programChooser;
     private final JCheckBox exclusive;
     private final JCheckBox weighted;
     private final JCheckBox symmetric;
     private final JLabel overallSimilarity;
 
-    private Similarity<T> similarity;
+    private final GhidraMetricsPlugin plugin;
 
-    public SimilarityGui(GhidraMetricsPlugin plugin, SimilarityMetricFactory<T> metricFactory) {
+    private Similarity similarity;
+
+    public SimilarityGui(GhidraMetricsPlugin plugin) {
+
+        this.plugin = plugin;
 
         panel = new JPanel(new BorderLayout());
 
@@ -68,8 +76,7 @@ public class SimilarityGui<T extends SimilarityInterface> {
                     c.setForeground(Color.BLACK);
 
                 }
-                if (value != null)
-                    setText(value instanceof Double ? formatter.format(value) : value.toString());
+                if (value != null) setText(value instanceof Double ? formatter.format(value) : value.toString());
                 else {
                     c.setBackground(Color.WHITE);
                     setText("―");
@@ -110,8 +117,17 @@ public class SimilarityGui<T extends SimilarityInterface> {
 
         List<DomainFile> programFiles = ProjectUtils.getPrograms(plugin.getTool().getProject());
 
-
         JPanel topPanel = new JPanel(new BorderLayout());
+
+        JPanel metricSelection = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        metricChooser = new JComboBox<>(metrics);
+        metricChooser.setSelectedIndex(3);
+        metricSelection.add(new JLabel("Metric: "));
+        metricSelection.add(metricChooser);
+
+        topPanel.add(metricSelection, BorderLayout.NORTH);
+
+        JPanel settingsPanel = new JPanel(new BorderLayout());
 
         JPanel leftTopPanel = new JPanel(new BorderLayout());
         JPanel rightTopPanel = new JPanel(new FlowLayout());
@@ -139,24 +155,9 @@ public class SimilarityGui<T extends SimilarityInterface> {
         programChooser.setSelectedIndex(-1);
         programChooser.setVisible(true);
 
-        programChooser.addActionListener(e -> {
-            try {
-                DomainFile choice = (DomainFile) programChooser.getSelectedItem();
-                if (choice != null) {
-                    Program program = ProjectUtils.getProgramFromDomainFile(choice);
-                    similarity = new Similarity<>(plugin.getCurrentProgram(), program, metricFactory);
-                    SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
-                    result.sortBySimilarity();
-                    overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
-                    populateTable(result);
-                }
-            } catch (Exception ex) {
-                Msg.showError(getClass(), panel, "Metric computation failed!", Arrays.toString(ex.getStackTrace()));
-                similarity = null;
-                overallSimilarity.setText("N/A");
-                programChooser.setSelectedIndex(-1);
-            }
-        });
+        programChooser.addActionListener(e -> computeMetrics());
+
+        metricChooser.addActionListener(e -> computeMetrics());
 
         ActionListener checkBoxHandler = e -> {
             if (programChooser.getSelectedIndex() >= 0 && similarity != null) {
@@ -177,13 +178,33 @@ public class SimilarityGui<T extends SimilarityInterface> {
         leftTopPanel.add(inputPanel, BorderLayout.NORTH);
         leftTopPanel.add(outputPanel, BorderLayout.CENTER);
 
-        topPanel.add(leftTopPanel, BorderLayout.WEST);
-        topPanel.add(rightTopPanel, BorderLayout.EAST);
+        settingsPanel.add(leftTopPanel, BorderLayout.WEST);
+        settingsPanel.add(rightTopPanel, BorderLayout.EAST);
+        topPanel.add(settingsPanel, BorderLayout.CENTER);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         panel.putClientProperty("tableModel", tableModel);
+    }
+
+    private void computeMetrics() {
+        try {
+            DomainFile choice = (DomainFile) programChooser.getSelectedItem();
+            if (choice != null) {
+                Program program = ProjectUtils.getProgramFromDomainFile(choice);
+                SimilarityInterface metric = (SimilarityInterface) metricChooser.getSelectedItem();
+                similarity = new Similarity(plugin.getCurrentProgram(), program, metric);
+                SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
+                result.sortBySimilarity();
+                overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
+                populateTable(result);
+            }
+        } catch (Exception ex) {
+            Msg.showError(getClass(), panel, "Metric computation failed!", Arrays.toString(ex.getStackTrace()));
+            overallSimilarity.setText("N/A");
+            programChooser.setSelectedIndex(-1);
+        }
     }
 
     public void populateTable(SimilarityResult result) {
@@ -202,6 +223,7 @@ public class SimilarityGui<T extends SimilarityInterface> {
             tableModel.setRowCount(0);
             programChooser.setSelectedIndex(-1);
         }
+        metricChooser.setSelectedIndex(3);
         overallSimilarity.setText("N/A");
         exclusive.setSelected(false);
         weighted.setSelected(false);
