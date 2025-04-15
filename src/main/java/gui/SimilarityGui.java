@@ -1,5 +1,6 @@
 package gui;
 
+import generic.stl.Pair;
 import ghidra.app.services.GoToService;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Function;
@@ -12,6 +13,7 @@ import impl.metrics.*;
 import impl.utils.FunctionUtils;
 import impl.utils.ProjectUtils;
 import metrics.GhidraMetricsPlugin;
+import resources.Icons;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -19,7 +21,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,6 +43,7 @@ public class SimilarityGui {
     private final GhidraMetricsPlugin plugin;
 
     private Similarity similarity;
+    private SimilarityResult lastResult;
 
     public SimilarityGui(GhidraMetricsPlugin plugin) {
 
@@ -53,6 +59,10 @@ public class SimilarityGui {
         };
 
         JTable table = new JTable(tableModel);
+        table.setRowSelectionAllowed(true);
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        table.setSelectionBackground(new Color(30, 144, 255)); // DodgerBlue
+        table.setSelectionForeground(Color.WHITE);
 
         table.setRowSorter(new TableRowSorter<>(tableModel));
 
@@ -75,10 +85,10 @@ public class SimilarityGui {
                     c.setBackground(new Color(red, green, blue));
                     c.setForeground(Color.BLACK);
 
-                }
-                if (value != null) setText(value instanceof Double ? formatter.format(value) : value.toString());
-                else {
+                    setText(formatter.format(value));
+                } else {
                     c.setBackground(Color.WHITE);
+                    c.setForeground(Color.BLACK);
                     setText("―");
                 }
 
@@ -109,6 +119,38 @@ public class SimilarityGui {
                             goToService.goTo(function.getEntryPoint());
                         }
                     }
+                }
+            }
+        });
+
+        JPopupMenu popupMenu = new JPopupMenu();
+
+        JMenuItem applyNameRight = new JMenuItem("Apply Name Right", Icons.RIGHT_ICON);
+        JMenuItem applyNameLeft = new JMenuItem("Apply Name Left", Icons.LEFT_ICON);
+
+        popupMenu.add(applyNameRight);
+        popupMenu.add(applyNameLeft);
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopup(e);
+            }
+
+            private void showPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int row = table.rowAtPoint(e.getPoint());
+
+                    if (row != -1 && !table.isRowSelected(row)) {
+                        table.setRowSelectionInterval(row, row);
+                    }
+
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
@@ -161,10 +203,10 @@ public class SimilarityGui {
 
         ActionListener checkBoxHandler = e -> {
             if (programChooser.getSelectedIndex() >= 0 && similarity != null) {
-                SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
-                result.sortBySimilarity();
-                overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
-                populateTable(result);
+                lastResult = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
+                lastResult.sortBySimilarity();
+                overallSimilarity.setText(String.format("%.2f", lastResult.overallSimilarity));
+                populateTable();
             }
         };
 
@@ -185,6 +227,42 @@ public class SimilarityGui {
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
+        applyNameRight.addActionListener(evt -> {
+            int[] selectedRows = table.getSelectedRows();
+            List<Pair<Function, String>> replacements = new ArrayList<>();
+            DomainFile choice = (DomainFile) programChooser.getSelectedItem();
+            Program program = ProjectUtils.getProgramFromDomainFile(choice);
+
+            for (int selectedRow : selectedRows) {
+                int modelRow = table.convertRowIndexToModel(selectedRow);
+
+                Function targetFunction = FunctionUtils.getFunctionByName(program, (String) tableModel.getValueAt(modelRow, 3));
+                String newName = (String) tableModel.getValueAt(modelRow, 2);
+
+                replacements.add(new Pair<>(targetFunction, newName));
+            }
+
+            FunctionUtils.applyNames(program, replacements);
+            populateTable();
+        });
+
+        applyNameLeft.addActionListener(evt -> {
+            int[] selectedRows = table.getSelectedRows();
+            List<Pair<Function, String>> replacements = new ArrayList<>();
+
+            for (int selectedRow : selectedRows) {
+                int modelRow = table.convertRowIndexToModel(selectedRow);
+
+                Function targetFunction = FunctionUtils.getFunctionByName(plugin.getCurrentProgram(), (String) tableModel.getValueAt(modelRow, 2));
+                String newName = (String) tableModel.getValueAt(modelRow, 3);
+
+                replacements.add(new Pair<>(targetFunction, newName));
+            }
+
+            FunctionUtils.applyNames(plugin.getCurrentProgram(), replacements);
+            populateTable();
+        });
+
         panel.putClientProperty("tableModel", tableModel);
     }
 
@@ -195,10 +273,10 @@ public class SimilarityGui {
                 Program program = ProjectUtils.getProgramFromDomainFile(choice);
                 SimilarityInterface metric = (SimilarityInterface) metricChooser.getSelectedItem();
                 similarity = new Similarity(plugin.getCurrentProgram(), program, metric);
-                SimilarityResult result = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
-                result.sortBySimilarity();
-                overallSimilarity.setText(String.format("%.2f", result.overallSimilarity));
-                populateTable(result);
+                lastResult = similarity.getOverallSimilarity(exclusive.isSelected(), weighted.isSelected(), symmetric.isSelected());
+                lastResult.sortBySimilarity();
+                overallSimilarity.setText(String.format("%.2f", lastResult.overallSimilarity));
+                populateTable();
             }
         } catch (Exception ex) {
             Msg.showError(getClass(), panel, "Metric computation failed!", Arrays.toString(ex.getStackTrace()));
@@ -207,11 +285,11 @@ public class SimilarityGui {
         }
     }
 
-    public void populateTable(SimilarityResult result) {
+    public void populateTable() {
         DefaultTableModel tableModel = (DefaultTableModel) panel.getClientProperty("tableModel");
         if (tableModel != null) {
             tableModel.setRowCount(0);
-            for (Object[] row : result.getFunctionSimilarities()) {
+            for (Object[] row : lastResult.getFunctionSimilarities()) {
                 tableModel.addRow(row);
             }
         }
@@ -223,6 +301,7 @@ public class SimilarityGui {
             tableModel.setRowCount(0);
             programChooser.setSelectedIndex(-1);
         }
+        lastResult = null;
         metricChooser.setSelectedIndex(3);
         overallSimilarity.setText("N/A");
         exclusive.setSelected(false);

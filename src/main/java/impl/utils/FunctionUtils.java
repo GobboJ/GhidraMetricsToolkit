@@ -1,11 +1,15 @@
 package impl.utils;
 
+import generic.stl.Pair;
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.FunctionIterator;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryAccessException;
+import ghidra.program.model.symbol.SourceType;
+import ghidra.util.exception.DuplicateNameException;
+import ghidra.util.exception.InvalidInputException;
 import org.apache.commons.text.similarity.SimilarityInput;
 
 import java.util.ArrayList;
@@ -45,6 +49,19 @@ public class FunctionUtils {
                 return f;
         }
         return null;
+    }
+
+    public static void applyNames(Program targetProgram, List<Pair<Function, String>> replacements) {
+        int tx = targetProgram.startTransaction("Rename Functions");
+        try {
+            for (Pair<Function, String> replacement : replacements) {
+                replacement.first.setName(replacement.second, SourceType.USER_DEFINED);
+            }
+        } catch (InvalidInputException | DuplicateNameException e) {
+            throw new RuntimeException(e);
+        } finally {
+            targetProgram.endTransaction(tx, true);
+        }
     }
 
     public static Map<String, Double> getHistogram(Function function) {
