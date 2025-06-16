@@ -4,6 +4,9 @@ GhidraMetrics is a Ghidra plugin that provides a collection of Software Metrics.
 
 All the metrics can be computed through the GUI as well as through the script, even in headless mode.
 
+![Screenshot](https://github.com/user-attachments/assets/6fc70026-b222-42cc-9728-ce671166c3ad)
+
+
 ## Installing
 
 Download the latest release matching your Ghidra version and install it through the `File > Install Extensions` menu in the Ghidra tool launcher, or unzip the content in the `<GhidraInstallDir>/Ghidra/Extensions` folder.
