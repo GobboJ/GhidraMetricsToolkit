@@ -1,6 +1,7 @@
-# Ghidra Metrics
+# GhidraMetrics
 
-This Ghidra plugin provides a set of Software Metrics.
+GhidraMetrics is a Ghidra plugin that provides a collection of Software Metrics.
+
 All the metrics can be computed through the GUI as well as through the script, even in headless mode.
 
 ## Installing
@@ -19,31 +20,63 @@ The GhidraMetrics GUI can be opened through the `Window > GhidraMetricsPlugin` m
 
 This plugin provides a method to compute the overall McCabe Cyclomatic Complexity of the entire program, in addition to Ghidra's own `ghidra.program.util.CyclomaticComplexity` that computes it on a per-function basis.
 
+Headless Parameters:
+
+- `--overall-only`: computes only the overall complexity.
+
 ### Entropy
 
 The entropy is computed on the overall binary as well as on each program section. The base is customizable and defaulted to 2.
+
+Headless Parameters:
+
+- `--base <int>`: sets a base value for the computation. 
 
 ### Halstead Metrics
 
 Halstead Metrics are provided both for the overall program and the currently highlighted function in the code listing. When using the GUI, both are computed automatically on every program or function change, while the headless script only computes it for the whole program.
 
-### Longest Common Subsequence Similarity
+### Similarity
 
-Similarity metric based on the longest common subsequence size between the code listing of two functions. It lists the most similar function in the second program for each function in the first.
+The plugin provides a Binary Similarity tool that computes an overall similarity score and matches each function in a program with the most similar in the second.
 
-### Normalized Compression Distance Similarity
+Several function level similarity metrics are provided:
 
-Compression based similarity metric. It uses the built-in `lrzip` binary to compress the programs, and is therefore only available on linux x86-64 platforms. It provides an overall similarity value as well as shows the most similar function in the second program for each function in the first.
+- Longest Common Subsequence
+- Normalized Compression Distance
+- Opcode Frequency Histogram Matching
+- Levenshtein Distance
+- Jaro-Winkler Similarity
+- Jaccard Index
 
-### Opcode Frequency Histogram Similarity
+The Normalized Compression Distance metric uses the built-in `lrzip` binary to compress the programs, and is therefore only available on linux x86-64 and arm64 platforms.
 
-Similarity metric that matches functions according to their opcode frequency histograms.
+Additionally, the tool allows to customize the matching strategy with 3 options:
 
-### ROP Gadget Survival Similarity
+- Exclusive: whether matches should be one-to-one or one-to-many;
+- Weighted: whether the overall similarity score should depend on the weight of the functions (in terms of number of instructions);
+- Symmetric: whether the overall similarity score should be computed by averaging $S(P_1, P_2)$ and $S(P_2, P_1)$.
+
+Headless Parameters:
+
+- `programName`: the name of the second program for the comparison. Must be part of the Ghidra project;
+- `--binary-only`: only computes the overall similarity (only for NCD);
+- `--exclusive`;
+- `--weighted`;
+- `--symmetric`.
+
+### ROP Gadget Survival
 
 This metric computes the percentage of gadgets present in the first program that survive in the second program. More specifically, two variants are computed:
 
 - Survivor: considers both the sequence of bytes of a gadget and its program offset;
 - Bag of Gadgets: only considers the sequence of bytes, regardless of its position.
 
-It is possible to set the maximum ROP depth search size in bytes, defaulted to 10.
+It is possible to customize the maximum ROP depth search size in bytes, defaulted to 10.
+
+Headless Parameters:
+- `--depth <int>`: sets the search depth.
+
+## Exporting
+
+To export data, use the `--csv-export <path>` option in headless mode, with any metric. Appending to the same file in multiple runs is allowed.
