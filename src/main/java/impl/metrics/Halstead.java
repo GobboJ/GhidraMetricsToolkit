@@ -60,15 +60,15 @@ public class Halstead implements MetricInterface {
 
             double estimatedLength = n_1 * Math.log(n_1) + n_2 * Math.log(n_2);
             metrics.add(new Pair<>("Estimated Length (~N)", estimatedLength));
-            double volume = programLength * Math.log(programVocab);
+            double volume = programLength * Math.log(programVocab) / Math.log(2);
             metrics.add(new Pair<>("Volume (V)", volume));
-            double difficulty = (double) n_1 / 2 * N_2 / 2;
+            double difficulty = (double) n_1 / 2 * N_2 / n_2;
             metrics.add(new Pair<>("Difficulty (D)", difficulty));
             double effort = volume * difficulty;
             metrics.add(new Pair<>("Effort (E)", effort));
             double timeToProgram = effort / 18;
             metrics.add(new Pair<>("Time to Program (T)", timeToProgram));
-            double deliveredBugs = volume / 3000;
+            double deliveredBugs = Math.pow(effort, (double) 2 / 3) / 3000;
             metrics.add(new Pair<>("Delivered Bugs (B)", deliveredBugs));
 
             return metrics;
