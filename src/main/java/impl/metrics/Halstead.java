@@ -58,7 +58,7 @@ public class Halstead implements MetricInterface {
             int programLength = N_1 + N_2;
             metrics.add(new Pair<>("Program Length (N)", (double) programLength));
 
-            double estimatedLength = n_1 * Math.log(n_1) + n_2 * Math.log(n_2);
+            double estimatedLength = n_1 * Math.log(n_1) / Math.log(2) + n_2 * Math.log(n_2) / Math.log(2);
             metrics.add(new Pair<>("Estimated Length (~N)", estimatedLength));
             double volume = programLength * Math.log(programVocab) / Math.log(2);
             metrics.add(new Pair<>("Volume (V)", volume));
