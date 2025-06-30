@@ -23,6 +23,7 @@ jobs:
       - name: Setup Ghidra Action
         uses: antoniovazquezblanco/setup-ghidra@v2.0.12
         with:
+          auth_token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ matrix.ghidra }}
       - name: Build
         run: gradle buildExtension
