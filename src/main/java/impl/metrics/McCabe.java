@@ -123,26 +123,17 @@ public class McCabe implements MetricInterface {
 
         GDirectedGraph<String, GEdge<String>> graph = GraphFactory.createDirectedGraph();
 
-        HashSet<String> vertices = new HashSet<>();
-
         for (CodeBlock block : bIter) {
-            if (!vertices.contains(block.getName())) {
-                vertices.add(block.getName());
-                graph.addVertex(block.getName());
-            }
+
+            graph.addVertex(block.getName());
 
             CodeBlockReferenceIterator bDestIter = block.getDestinations(ctm);
-
             while (bDestIter.hasNext()) {
                 CodeBlockReference ref = bDestIter.next();
                 if (ref.getFlowType().isCall()) {
                     continue;
                 }
                 String destName = ref.getDestinationBlock().getName();
-                if (vertices.contains(destName)) {
-                    vertices.add(destName);
-                    graph.addVertex(destName);
-                }
 
                 graph.addEdge(new GEdge<>() {
                     @Override
