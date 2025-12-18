@@ -1,6 +1,6 @@
-# GhidraMetrics
+# Ghidra Metrics Toolkit
 
-GhidraMetrics is a Ghidra plugin that provides a collection of Software Metrics.
+Ghidra Metrics Toolkit is a Ghidra plugin that provides a collection of Software Metrics.
 
 All the metrics can be computed through the GUI as well as through the script, even in headless mode.
 
@@ -15,7 +15,7 @@ The ROP Gadget Survival Similarity metric relies on `ROPGadget`, which must be i
 
 ## Running
 
-The GhidraMetrics GUI can be opened through the `Window > GhidraMetricsPlugin` menu in the CodeBrowser.
+The Ghidra Metrics Toolkit GUI can be opened through the `Window > Ghidra Metrics ToolkitPlugin` menu in the CodeBrowser.
 
 ## Metrics
 
