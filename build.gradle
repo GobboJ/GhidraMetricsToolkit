@@ -29,6 +29,10 @@
 // application.gradle.version property in <GHIDRA_INSTALL_DIR>/Ghidra/application.properties
 // for the correction version of Gradle to use for the Ghidra installation you specify.
 
+plugins {
+    id("com.gradleup.shadow") version "9.3.0"
+}
+
 //----------------------START "DO NOT MODIFY" SECTION------------------------------
 def ghidraInstallDir
 
@@ -55,25 +59,39 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    shadedLibs
+}
+
 dependencies {
 	// Any external dependencies added here will automatically be copied to the lib/ directory when
 	// this extension is built.
     implementation 'info.picocli:picocli:4.7.6'
-    implementation 'org.apache.commons:commons-text:1.13.0'
+
+    compileOnly 'org.apache.commons:commons-text:1.15.0'
+    shadedLibs 'org.apache.commons:commons-text:1.15.0'
 }
 
-configurations.all {
-    resolutionStrategy {
-        force 'org.apache.commons:commons-text:1.13.0'
+compileJava {
+    doFirst {
+        classpath = configurations.shadedLibs + classpath
     }
 }
 
-// Exclude additional files from the built extension
-// Ex: buildExtension.exclude '.idea/**'
+//
+shadowJar {
+    configurations = [project.configurations.shadedLibs]
+		archiveClassifier.set('')
+    relocate 'org.apache.commons.text',
+            'shadow.org.apache.commons.text'
+}
+
+shadowJar.mustRunAfter jar
 
 // Exclude additional files from the built extension
 // Ex: buildExtension.exclude '.idea/**'
 buildExtension.exclude '.idea/**'
+buildExtension.dependsOn shadowJar
 
 // Add the ghidra_scripts dir to the java sources
 sourceSets.main.java.srcDirs += ['ghidra_scripts']
