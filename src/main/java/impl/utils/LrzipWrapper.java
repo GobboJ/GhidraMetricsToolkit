@@ -12,6 +12,14 @@ public class LrzipWrapper {
 
     public LrzipWrapper(String binaryPath) {
         lrzipPath = binaryPath;
+
+        File lrzipFile = new File(lrzipPath);
+        if (lrzipFile.exists() && !lrzipFile.canExecute()) {
+            boolean success = lrzipFile.setExecutable(true);
+            if (!success) {
+                System.err.println("Failed to set executable permissions for " + lrzipFile.getAbsolutePath());
+            }
+        }
     }
 
     private File concatenate(File f1, File f2) {
