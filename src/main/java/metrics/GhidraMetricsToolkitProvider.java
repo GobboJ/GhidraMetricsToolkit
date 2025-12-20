@@ -6,9 +6,9 @@ import gui.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class GhidraMetricsProvider extends ComponentProviderAdapter {
+public class GhidraMetricsToolkitProvider extends ComponentProviderAdapter {
 
-    private final GhidraMetricsPlugin plugin;
+    private final GhidraMetricsToolkitPlugin plugin;
     private JPanel panel;
 
     private EntropyGui entropyGui;
@@ -17,7 +17,7 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
     private SimilarityGui similarityGui;
     private RopSurvivalGui ropSimilarityGui;
 
-    public GhidraMetricsProvider(GhidraMetricsPlugin ghidraMetricsPlugin, String pluginName) {
+    public GhidraMetricsToolkitProvider(GhidraMetricsToolkitPlugin ghidraMetricsPlugin, String pluginName) {
         super(ghidraMetricsPlugin.getTool(), pluginName, pluginName);
         this.plugin = ghidraMetricsPlugin;
         buildPanel();

@@ -12,7 +12,7 @@ import impl.common.SimilarityResult;
 import impl.metrics.*;
 import impl.utils.FunctionUtils;
 import impl.utils.ProjectUtils;
-import metrics.GhidraMetricsPlugin;
+import metrics.GhidraMetricsToolkitPlugin;
 import resources.Icons;
 
 import javax.swing.*;
@@ -40,12 +40,12 @@ public class SimilarityGui {
     private final JCheckBox symmetric;
     private final JLabel overallSimilarity;
 
-    private final GhidraMetricsPlugin plugin;
+    private final GhidraMetricsToolkitPlugin plugin;
 
     private Similarity similarity;
     private SimilarityResult lastResult;
 
-    public SimilarityGui(GhidraMetricsPlugin plugin) {
+    public SimilarityGui(GhidraMetricsToolkitPlugin plugin) {
 
         this.plugin = plugin;
 

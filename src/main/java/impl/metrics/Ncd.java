@@ -19,7 +19,7 @@ public class Ncd implements SimilarityInterface {
 
     public Ncd() {
         try {
-            lrzipPath = Application.getOSFile("GhidraMetrics", "lrzip").getPath();
+            lrzipPath = Application.getOSFile("GhidraMetricsToolkit", "lrzip").getPath();
         } catch (OSFileNotFoundException e) {
             throw new RuntimeException(e);
         }

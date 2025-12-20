@@ -11,21 +11,21 @@ import ghidra.program.util.ProgramLocation;
 //@formatter:off
 @PluginInfo(
         status = PluginStatus.UNSTABLE,
-        packageName = GhidraMetricsPlugin.PACKAGE_NAME,
+        packageName = GhidraMetricsToolkitPlugin.PACKAGE_NAME,
         category = PluginCategoryNames.EXAMPLES,
         shortDescription = "Collection of Metrics",
         description = "This plugin provides a collection of metrics to be computed on a native binary"
 )
 //@formatter:on
-public class GhidraMetricsPlugin extends ProgramPlugin {
+public class GhidraMetricsToolkitPlugin extends ProgramPlugin {
 
     public static final String PACKAGE_NAME = "metrics";
-    GhidraMetricsProvider provider;
+    GhidraMetricsToolkitProvider provider;
 
-    public GhidraMetricsPlugin(PluginTool plugintool) {
+    public GhidraMetricsToolkitPlugin(PluginTool plugintool) {
         super(plugintool);
         String pluginName = getName();
-        provider = new GhidraMetricsProvider(this, pluginName);
+        provider = new GhidraMetricsToolkitProvider(this, pluginName);
     }
 
     @Override

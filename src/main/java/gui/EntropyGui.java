@@ -1,7 +1,7 @@
 package gui;
 
 import impl.metrics.Entropy;
-import metrics.GhidraMetricsPlugin;
+import metrics.GhidraMetricsToolkitPlugin;
 import resources.Icons;
 
 import javax.swing.*;
@@ -16,12 +16,12 @@ public class EntropyGui {
     private static final String[] columnNames = {"Section", "Entropy"};
 
     private final JPanel panel;
-    private final GhidraMetricsPlugin plugin;
+    private final GhidraMetricsToolkitPlugin plugin;
 
     private final JLabel binaryResult;
     private final JTextField baseInput;
 
-    public EntropyGui(GhidraMetricsPlugin plugin) {
+    public EntropyGui(GhidraMetricsToolkitPlugin plugin) {
 
         this.plugin = plugin;
         panel = new JPanel(new BorderLayout());

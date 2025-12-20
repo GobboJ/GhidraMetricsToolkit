@@ -5,7 +5,7 @@ import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.util.ProgramLocation;
 import impl.metrics.Halstead;
-import metrics.GhidraMetricsPlugin;
+import metrics.GhidraMetricsToolkitPlugin;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,9 +16,9 @@ public class HalsteadGui {
     private static final String[] columnNames = {"Metric", "Value"};
 
     private final JPanel panel;
-    private final GhidraMetricsPlugin plugin;
+    private final GhidraMetricsToolkitPlugin plugin;
 
-    public HalsteadGui(GhidraMetricsPlugin plugin) {
+    public HalsteadGui(GhidraMetricsToolkitPlugin plugin) {
 
         this.plugin = plugin;
 

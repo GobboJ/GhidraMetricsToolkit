@@ -1,7 +1,7 @@
 package gui;
 
 import impl.metrics.McCabe;
-import metrics.GhidraMetricsPlugin;
+import metrics.GhidraMetricsToolkitPlugin;
 import resources.Icons;
 
 import javax.swing.*;
@@ -14,11 +14,11 @@ public class McCabeGui {
     private static final String[] columnNames = {"Function", "Complexity"};
 
     private final JPanel panel;
-    private final GhidraMetricsPlugin plugin;
+    private final GhidraMetricsToolkitPlugin plugin;
 
     private final JLabel complexityResult;
 
-    public McCabeGui(GhidraMetricsPlugin plugin) {
+    public McCabeGui(GhidraMetricsToolkitPlugin plugin) {
 
         this.plugin = plugin;
         panel = new JPanel(new BorderLayout());

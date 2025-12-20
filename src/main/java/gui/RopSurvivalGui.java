@@ -4,7 +4,7 @@ import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
 import impl.metrics.RopSurvival;
-import metrics.GhidraMetricsPlugin;
+import metrics.GhidraMetricsToolkitPlugin;
 import impl.utils.ProjectUtils;
 
 import javax.swing.*;
@@ -14,13 +14,13 @@ import java.util.List;
 public class RopSurvivalGui {
 
     private final JPanel panel;
-    private final GhidraMetricsPlugin plugin;
+    private final GhidraMetricsToolkitPlugin plugin;
     private final JComboBox<DomainFile> programChooser;
     private final JLabel bagOfGadgetsResult;
     private final JLabel survivorResult;
     private final JTextField depthField;
 
-    public RopSurvivalGui(GhidraMetricsPlugin plugin) {
+    public RopSurvivalGui(GhidraMetricsToolkitPlugin plugin) {
         this.plugin = plugin;
 
         panel = new JPanel(new BorderLayout());
