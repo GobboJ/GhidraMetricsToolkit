@@ -28,17 +28,17 @@ public class GhidraMetricsProvider extends ComponentProviderAdapter {
         panel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
 
+        mcCabeGui = new McCabeGui(plugin);
+        tabbedPane.addTab("Complexity", mcCabeGui.getPanel());
+
         entropyGui = new EntropyGui(plugin);
         tabbedPane.addTab("Entropy", entropyGui.getPanel());
 
         halsteadGui = new HalsteadGui(plugin);
         tabbedPane.addTab("Halstead", halsteadGui.getPanel());
 
-        mcCabeGui = new McCabeGui(plugin);
-        tabbedPane.addTab("McCabe", mcCabeGui.getPanel());
-
         ropSimilarityGui = new RopSurvivalGui(plugin);
-        tabbedPane.addTab("ROP", ropSimilarityGui.getPanel());
+        tabbedPane.addTab("ROP Survival", ropSimilarityGui.getPanel());
 
         similarityGui = new SimilarityGui(plugin);
         tabbedPane.addTab("Similarity", similarityGui.getPanel());
