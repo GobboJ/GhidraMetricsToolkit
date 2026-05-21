@@ -47,7 +47,7 @@ public class EntropyScript extends GhidraScript {
         if (args.csvPath != null) {
             try {
                 List<Pair<String, String>> out = result.export();
-                Pair<String, String> binaryResult = out.getFirst();
+                Pair<String, String> binaryResult = out.get(0);
                 CsvExporter csvExporter = new CsvExporter(args.csvPath, binaryResult.first);
                 csvExporter.exportData(binaryResult.second);
             } catch (IOException e) {

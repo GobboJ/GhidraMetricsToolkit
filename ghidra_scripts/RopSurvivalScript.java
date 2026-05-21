@@ -64,7 +64,7 @@ public class RopSurvivalScript extends GhidraScript {
         if (csvPath != null) {
             try {
                 List<Pair<String, String>> out = result.export();
-                Pair<String, String> ropResult = out.getFirst();
+                Pair<String, String> ropResult = out.get(0);
                 CsvExporter csvExporter = new CsvExporter(csvPath, ropResult.first);
                 csvExporter.exportData(ropResult.second);
             } catch (IOException e) {

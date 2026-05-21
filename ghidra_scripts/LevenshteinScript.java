@@ -64,7 +64,7 @@ public class LevenshteinScript extends GhidraScript {
         if (csvPath != null) {
             try {
                 List<Pair<String, String>> out = result.export();
-                Pair<String, String> binaryResult = out.getFirst();
+                Pair<String, String> binaryResult = out.get(0);
                 CsvExporter csvExporter = new CsvExporter(csvPath, binaryResult.first);
                 csvExporter.exportData(binaryResult.second);
             } catch (IOException e) {

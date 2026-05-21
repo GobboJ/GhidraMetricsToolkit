@@ -39,7 +39,7 @@ public class HalsteadScript extends GhidraScript {
         if (args.csvPath != null) {
             try {
                 List<Pair<String, String>> out = result.export();
-                Pair<String, String> programHalstead = out.getFirst();
+                Pair<String, String> programHalstead = out.get(0);
                 CsvExporter csvExporter = new CsvExporter(args.csvPath, programHalstead.first);
                 csvExporter.exportData(programHalstead.second);
             } catch (IOException e) {
