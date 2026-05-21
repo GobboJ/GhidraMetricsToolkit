@@ -1,6 +1,5 @@
 package impl.common;
 
-import generic.stl.Pair;
 
 import java.util.List;
 

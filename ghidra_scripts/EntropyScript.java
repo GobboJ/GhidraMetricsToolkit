@@ -2,8 +2,8 @@
 //@author Ca' Foscari - Software Security
 //@category Metrics
 
-import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
+import impl.common.Pair;
 import impl.metrics.Entropy;
 import impl.common.ResultInterface;
 import impl.utils.CsvExporter;

@@ -2,9 +2,9 @@
 //@author Ca' Foscari - Software Security
 //@category Metrics
 
-import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.*;
+import impl.common.Pair;
 import impl.metrics.Halstead;
 import impl.utils.CsvExporter;
 import picocli.CommandLine;

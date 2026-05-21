@@ -1,6 +1,5 @@
 package impl.utils;
 
-import generic.stl.Pair;
 import ghidra.program.model.listing.CodeUnit;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.FunctionIterator;
@@ -10,6 +9,7 @@ import ghidra.program.model.mem.MemoryAccessException;
 import ghidra.program.model.symbol.SourceType;
 import ghidra.util.exception.DuplicateNameException;
 import ghidra.util.exception.InvalidInputException;
+import impl.common.Pair;
 import org.apache.commons.text.similarity.SimilarityInput;
 
 import java.util.ArrayList;

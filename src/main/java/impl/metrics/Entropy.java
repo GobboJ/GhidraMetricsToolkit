@@ -1,6 +1,5 @@
 package impl.metrics;
 
-import generic.stl.Pair;
 import ghidra.app.util.exporter.ExporterException;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.mem.Memory;
@@ -8,6 +7,7 @@ import ghidra.program.model.mem.MemoryBlock;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.exception.VersionException;
 import impl.common.MetricInterface;
+import impl.common.Pair;
 import impl.common.ResultInterface;
 import impl.utils.ProjectUtils;
 

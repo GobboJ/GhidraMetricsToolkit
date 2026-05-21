@@ -1,11 +1,11 @@
 package gui;
 
-import generic.stl.Pair;
 import ghidra.app.services.GoToService;
 import ghidra.framework.model.DomainFile;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.util.Msg;
+import impl.common.Pair;
 import impl.common.Similarity;
 import impl.common.SimilarityInterface;
 import impl.common.SimilarityResult;

@@ -1,6 +1,5 @@
 package impl.metrics;
 
-import generic.stl.Pair;
 import ghidra.graph.GDirectedGraph;
 import ghidra.graph.GEdge;
 import ghidra.graph.GraphFactory;
@@ -12,6 +11,7 @@ import ghidra.program.util.CyclomaticComplexity;
 import ghidra.util.exception.CancelledException;
 import ghidra.util.task.ConsoleTaskMonitor;
 import impl.common.MetricInterface;
+import impl.common.Pair;
 import impl.common.ResultInterface;
 
 import java.util.*;

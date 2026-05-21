@@ -1,9 +1,9 @@
 package gui;
 
-import generic.stl.Pair;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 import ghidra.program.util.ProgramLocation;
+import impl.common.Pair;
 import impl.metrics.Halstead;
 import metrics.GhidraMetricsToolkitPlugin;
 

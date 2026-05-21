@@ -1,8 +1,8 @@
 package impl.metrics;
 
-import generic.stl.Pair;
 import ghidra.program.model.listing.Program;
 import impl.common.MetricInterface;
+import impl.common.Pair;
 import impl.common.ResultInterface;
 import impl.utils.RopGadgetWrapper;
 

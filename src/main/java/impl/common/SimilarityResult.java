@@ -1,6 +1,5 @@
 package impl.common;
 
-import generic.stl.Pair;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Program;
 
